@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="ReserveSpot.AbstractEntity">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAiAQAACAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AbstractEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ReserveSpot.User">
+    <Position X="6.75" Y="3.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AIAAAEAAAAIAAAAAAQAAACAACAAAAAACAAAAAAAAAAg=</HashCode>
+      <FileName>User\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.Property">
+    <Position X="11" Y="3.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAgAAAIAAKAAAwiAAAAAAACBQAAgEAAAAA=</HashCode>
+      <FileName>Property\Property.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.BookingJSONDao">
+    <Position X="3.25" Y="14.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAIAAAAAAAAAAIAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Booking\BookingJSONDao.cs</FileName>
+      <NewMemberFileName>Property\PropertyJSONDao.cs</NewMemberFileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ReserveSpot.Booking">
+    <Position X="3" Y="3.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAgwAAAEAAACAAAAAEAAAAA=</HashCode>
+      <FileName>Booking\Booking.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.PropertyService">
+    <Position X="14.25" Y="12" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAQAAAAAAAQAAAAAAEIAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Property\PropertyService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="propertyDao" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="ReserveSpot.ReviewJSONDao">
+    <Position X="18.75" Y="14.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAIAAAAAAAAAAIAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Review\ReviewJSONDao.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ReserveSpot.ReviewService">
+    <Position X="19" Y="12" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAQAAAAAAEIAEAAAAAAAAAABAA=</HashCode>
+      <FileName>Review\ReviewService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="reviewDao" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="ReserveSpot.PropertyJSONDao">
+    <Position X="14.25" Y="14.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAIAAAAAAAAAAIAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Property\PropertyJSONDao.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ReserveSpot.UserJSONDao">
+    <Position X="8" Y="15" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAEAAAAACAABAAAAAAA=</HashCode>
+      <FileName>User\UserJSONDao.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ReserveSpot.UserService">
+    <Position X="8" Y="12" Width="2.75" />
+    <NestedTypes>
+      <Delegate Name="ReserveSpot.UserService.PropertyCreatedEventHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>User\UserService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAABAMIAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>User\UserService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="userDao" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="ReserveSpot.Review">
+    <Position X="16.75" Y="3.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAgQAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Review\Review.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.BookingService">
+    <Position X="4.25" Y="12" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAAIAAAAAAAAAAAAAQAAAAAAEIAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Booking\BookingService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="bookingDao" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="ReserveSpot.CreateBookingDto">
+    <Position X="26.75" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAgwAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Booking\CreateBookingDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.UpdateBookingDto">
+    <Position X="29.25" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAggAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Booking\UpdateBookingDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.DeleteBookingDto">
+    <Position X="29.5" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Booking\DeleteBookingDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.FindOneBookingDto">
+    <Position X="26.75" Y="3.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Booking\FindOneBookingDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.CreatePropertyDto">
+    <Position X="26.75" Y="6" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAIAAIAAAwiAAAAAAAAAQAAAEAAAAA=</HashCode>
+      <FileName>Property\CreatePropertyDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.UpdatePropertyDto">
+    <Position X="30.25" Y="8" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAAAIAAIAAAwyAAAAAAAAAQAAAEAAAAA=</HashCode>
+      <FileName>Property\UpdatePropertyDto.cs</FileName>
+      <NewMemberFileName>Booking\UpdateBookingDto.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.DeletePropertyDto">
+    <Position X="30" Y="6" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Property\DeletePropertyDto.cs</FileName>
+      <NewMemberFileName>Booking\DeleteBookingDto.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.FindAllPropertiesDto">
+    <Position X="26.75" Y="9.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAIAAAQiAAAAAAAAAQAAAEAAAAA=</HashCode>
+      <FileName>Property\FindAllPropertiesDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.CreateReviewDto">
+    <Position X="20.75" Y="1.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAgQAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Review\CreateReviewDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.UpdateReviewDto">
+    <Position X="23" Y="3.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAgAABAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Review\UpdateReviewDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.DeleteReviewDto">
+    <Position X="23" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Review\DeleteReviewDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.FindAllReviewsDto">
+    <Position X="20.75" Y="3.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Review\FindAllReviewsDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.CreateUserDto">
+    <Position X="20.75" Y="5.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAQAAAAAAAAAAAAACAAAAAAAAAAg=</HashCode>
+      <FileName>User\CreateUserDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ReserveSpot.UpdateUserDto">
+    <Position X="23.25" Y="5.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAgAAAAAAAAAAAAAAAAAACAAAAAAAAAAg=</HashCode>
+      <FileName>User\UpdateUserDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="ReserveSpot.IDao&lt;Entity&gt;">
+    <Position X="9" Y="9.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAIAAAAAAAAAAIAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataStorage\Dao.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
