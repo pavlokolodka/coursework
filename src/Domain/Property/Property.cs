@@ -6,6 +6,8 @@
         public string Description { get; set; }
         public PropertyType Type { get; set; }
         public string Location { get; set; }
+        public string ContactPhone { get; set; }
+        public string ContactName { get; set; }
         public decimal PricePerHour { get; set; }
         public int Capacity { get; set; }
         public DateTime StartDate { get; set; } 
@@ -20,7 +22,7 @@
             throw new NotImplementedException();
         }
 
-        public Property(string name, string description, PropertyType type, string location, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, string creatorID)
+        public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, string creatorID)
         {
             throw new NotImplementedException();
             
@@ -35,6 +37,8 @@
     public class PropertyDetails
     {
         public string? Name { get; set; }
+        public string? ContactName { get; set; }
+        public string? ContactPhone { get; set; }
         public string? Description { get; set; }
         public PropertyType? Type { get; set; }
         public string? Location { get; set; }

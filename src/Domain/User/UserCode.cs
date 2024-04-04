@@ -1,4 +1,6 @@
-﻿namespace ReserveSpot
+﻿using System.Diagnostics;
+
+namespace ReserveSpot
 {
     public class UserCode : AbstractEntity
     {
@@ -6,16 +8,19 @@
        
         public UserCode()
         {
-            throw new NotImplementedException();           
+                     
         }
 
-        public void GenerateUserCode() { 
-            throw new NotImplementedException();
+        public int GenerateUserCode() {
+            Random random = new Random();
+            int sixDigitNumber = random.Next(100000, 1000000);
+            Code = sixDigitNumber;
+            return sixDigitNumber;
         }
 
-        public void ValidateUserCode()
+        public bool ValidateUserCode()
         {
-            throw new NotImplementedException();
+            return UpdatedAt.AddHours(24) > DateTime.Now; 
         }
     }
 }

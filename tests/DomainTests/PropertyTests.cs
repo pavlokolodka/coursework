@@ -12,18 +12,22 @@ namespace DomainTests
             string description = "Test Description";
             PropertyType type = PropertyType.Apartment;
             string location = "Test Location";
+            string contactPhone = "+380667123491";
+            string contactName = "Ivan";
             decimal pricePerHour = 50.00m;
             int capacity = 5;
             DateTime startDate = DateTime.Now;
             DateTime endDate = DateTime.Now.AddDays(7);
             string creatorID = "user123";
 
-            Property property = new Property(name, description, type, location, pricePerHour, capacity, startDate, endDate, creatorID);
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
 
             Assert.AreEqual(name, property.Name);
             Assert.AreEqual(description, property.Description);
             Assert.AreEqual(type, property.Type);
             Assert.AreEqual(location, property.Location);
+            Assert.AreEqual(contactPhone, property.ContactPhone);
+            Assert.AreEqual(contactName, property.ContactPhone);
             Assert.AreEqual(pricePerHour, property.PricePerHour);
             Assert.AreEqual(capacity, property.Capacity);
             Assert.AreEqual(startDate, property.StartDate);
@@ -34,7 +38,7 @@ namespace DomainTests
         [TestMethod]
         public void Edit_UpdatesProperties()
         {
-            Property property = new Property("Test Property", "Test Description", PropertyType.Apartment, "Test Location", 50.00m, 5, DateTime.Now, DateTime.Now.AddDays(7), "user123");
+            Property property = new Property("Test Property", "Test Description", PropertyType.Apartment, "Test Location", "Ivan", "+380632123291", 50.00m, 5, DateTime.Now, DateTime.Now.AddDays(7), "user123");
             PropertyDetails updateDetails = new PropertyDetails
             {
                 Name = "New Name",
@@ -44,7 +48,9 @@ namespace DomainTests
                 PricePerHour = 60.00m,
                 Capacity = 6,
                 StartDate = DateTime.Now.AddDays(1),
-                EndDate = DateTime.Now.AddDays(8)
+                EndDate = DateTime.Now.AddDays(8),
+                ContactPhone = "+380667123491",
+                ContactName = "Joe"
             };
 
             bool result = property.Edit(updateDetails);
@@ -54,6 +60,8 @@ namespace DomainTests
             Assert.AreEqual(updateDetails.Description, property.Description);
             Assert.AreEqual(updateDetails.Type, property.Type);
             Assert.AreEqual(updateDetails.Location, property.Location);
+            Assert.AreEqual(updateDetails.ContactPhone, property.ContactPhone);
+            Assert.AreEqual(updateDetails.ContactName, property.ContactPhone);
             Assert.AreEqual(updateDetails.PricePerHour, property.PricePerHour);
             Assert.AreEqual(updateDetails.Capacity, property.Capacity);
             Assert.AreEqual(updateDetails.StartDate, property.StartDate);
