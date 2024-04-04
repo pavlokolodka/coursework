@@ -1,4 +1,6 @@
 ﻿using ReserveSpot;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace DomainTests
 {
@@ -18,10 +20,9 @@ namespace DomainTests
         [TestMethod]
         public void CompareTo_ReturnsZeroWhenEqual()
         {
-            AbstractEntity entity1 = new ConcreteEntity();
-            AbstractEntity entity2 = new ConcreteEntity();
+            AbstractEntity entity = new ConcreteEntity();
 
-            int result = entity1.CompareTo(entity2);
+            int result = entity.CompareTo(entity);
 
             Assert.AreEqual(0, result);
         }
@@ -32,10 +33,16 @@ namespace DomainTests
             AbstractEntity entity1 = new ConcreteEntity();
             AbstractEntity entity2 = new ConcreteEntity();
 
-         //   entity1.CreatedAt = DateTime.Now.AddMinutes(-1);
-         //   int result = entity1.CompareTo(entity2);
+            PropertyInfo createdAtProperty = typeof(ConcreteEntity).GetProperty("CreatedAt", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-          //  Assert.IsTrue(result > 0);
+            if (createdAtProperty != null && createdAtProperty.CanWrite)
+            {
+                createdAtProperty.SetValue(entity2, DateTime.Now.AddMinutes(1));
+            }
+
+            int result = entity1.CompareTo(entity2);
+
+            Assert.IsTrue(result < 0);
         }
 
         [TestMethod]
@@ -44,10 +51,15 @@ namespace DomainTests
             AbstractEntity entity1 = new ConcreteEntity();
             AbstractEntity entity2 = new ConcreteEntity();
 
-          //  entity2.CreatedAt = DateTime.Now.AddMinutes(-1);
-          //  int result = entity1.CompareTo(entity2);
+            PropertyInfo createdAtProperty = typeof(ConcreteEntity).GetProperty("CreatedAt", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (createdAtProperty != null && createdAtProperty.CanWrite)
+            {
+                createdAtProperty.SetValue(entity2, DateTime.Now.AddMinutes(-1));
+            }
 
-         //   Assert.IsTrue(result < 0);
+              int result = entity1.CompareTo(entity2);
+
+               Assert.IsTrue(result > 0);
         }
     }
 
