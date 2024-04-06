@@ -15,8 +15,8 @@ namespace DomainTests
         {
             int rating = faker.Random.Number(0, 10);
             string comment = faker.Lorem.Text();
-            string userId = faker.Random.Uuid().ToString();
-            string propertyId = faker.Random.Uuid().ToString(); 
+            Guid userId = faker.Random.Uuid();
+            Guid propertyId = faker.Random.Uuid(); 
 
             Review review = new Review(rating, comment, userId, propertyId);
 
@@ -29,7 +29,7 @@ namespace DomainTests
         [TestMethod]
         public void TestReviewEdit()
         {
-            Review review = new Review(5, "Old comment", faker.Random.Uuid().ToString(), faker.Random.Uuid().ToString());
+            Review review = new Review(5, "Old comment", faker.Random.Uuid(), faker.Random.Uuid());
 
             review.Edit(8, "New comment");
 
@@ -40,7 +40,7 @@ namespace DomainTests
         [TestMethod]
         public void TestPartialEdit()
         {
-            Review review = new Review(5, "Test comment", faker.Random.Uuid().ToString(), faker.Random.Uuid().ToString());
+            Review review = new Review(5, "Test comment", faker.Random.Uuid(), faker.Random.Uuid());
 
             string comment = faker.Lorem.Text();
             int rating = faker.Random.Number(0, 10);
@@ -57,14 +57,13 @@ namespace DomainTests
         [TestMethod]
         public void TestReviewConstructor_InvalidParams()
         {
-            string propertyId = null;
-            string userId = null;
+            Guid userId = faker.Random.Uuid();
+            Guid propertyId = faker.Random.Uuid();
             int invalidRating = 11;
             int invalidCommentLength = 301;
             string comment = faker.Lorem.Sentence(invalidCommentLength);
 
             var review = new Review(invalidRating, comment, userId, propertyId);
-
             var context = new ValidationContext(review, serviceProvider: null, items: null);
             var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
             var isValid = Validator.TryValidateObject(review, context, results, true);
@@ -81,43 +80,18 @@ namespace DomainTests
 
             foreach (var result in results)
             {
-                Debug.WriteLine(result.ErrorMessage);
                 foreach (var memberName in result.MemberNames)
                 {
                    Assert.AreEqual(expectedErrors[memberName], result.ErrorMessage);                   
                 }
-            }
-
-            var expectedErrors2 = new Dictionary<string, string>
-            {
-                { nameof(Review.PropertyID), "PropertyID must be a UUID" },
-                { nameof(Review.UserID), "UserID must be a UUID" },
-                { nameof(Review.Rating), "Rating must be between 1 and 10" },
-                { nameof(Review.Comment), "Comment must be a string with a maximum length of 300" }
-            };
-
-            var review2 = new Review(invalidRating, comment, "invalidUUID", "invalidUUID");
-
-            var context2 = new ValidationContext(review2, serviceProvider: null, items: null);
-            var results2 = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
-            var isValid2 = Validator.TryValidateObject(review2, context2, results2, true);
-
-            Assert.IsFalse(isValid2);
-
-            foreach (var result in results2)
-            {                
-                foreach (var memberName in result.MemberNames)
-                {
-                    Assert.AreEqual(expectedErrors2[memberName], result.ErrorMessage);
-                }
-            }
+            }       
         }
 
         [TestMethod]
         public void TestReviewEdit_InvalidParams()
         {
-            Review review = new Review(5, "Old comment", faker.Random.Uuid().ToString(), faker.Random.Uuid().ToString());
-
+            Review review = new Review(5, "Old comment", faker.Random.Uuid(), faker.Random.Uuid());
+                
             int invalidRating = 11;
             int invalidCommentLength = 301;
             string comment = faker.Lorem.Sentence(invalidCommentLength);
@@ -138,7 +112,6 @@ namespace DomainTests
 
             foreach (var result in results)
             {
-                Debug.WriteLine(result.ErrorMessage, review.UserID);
                 foreach (var memberName in result.MemberNames)
                 {
                     Assert.AreEqual(expectedErrors[memberName], result.ErrorMessage);

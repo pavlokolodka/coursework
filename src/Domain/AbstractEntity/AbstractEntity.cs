@@ -2,7 +2,7 @@
 {
     public abstract class AbstractEntity : IComparable<AbstractEntity>
     {
-        public string ID { get; set; }
+        public Guid ID { get; set; }
         public DateTime CreatedAt { get; internal set; }
         public DateTime UpdatedAt { get; set; }
 
@@ -15,9 +15,8 @@
 
         private void GenerateId()
         {
-            Guid uuid = Guid.NewGuid();
-            string uuidString = uuid.ToString();
-            this.ID = uuidString;
+            Guid guid = Guid.NewGuid();
+            ID = guid;
         }
 
         public int CompareTo(AbstractEntity? other)
