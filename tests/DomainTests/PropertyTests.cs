@@ -1,24 +1,28 @@
-﻿using ReserveSpot;
+﻿using Bogus;
+using ReserveSpot;
+using System.ComponentModel.DataAnnotations;
 
 namespace DomainTests
 {
     [TestClass]
     public class PropertyTests
     {
+        public Faker faker = new Faker("en");
+
         [TestMethod]
         public void Constructor_InitializesProperties()
         {
-            string name = "Test Property";
-            string description = "Test Description";
-            PropertyType type = PropertyType.Apartment;
-            string location = "Test Location";
-            string contactPhone = "+380667123491";
-            string contactName = "Ivan";
-            decimal pricePerHour = 50.00m;
-            int capacity = 5;
-            DateTime startDate = DateTime.Now;
-            DateTime endDate = DateTime.Now.AddDays(7);
-            string creatorID = "user123";
+            string name = faker.Commerce.ProductName();
+            string description = faker.Lorem.Sentence();
+            PropertyType type = faker.PickRandom<PropertyType>();
+            string location = faker.Address.FullAddress();
+            string contactPhone = faker.Phone.PhoneNumber("+380#########");
+            string contactName = faker.Name.FirstName();
+            decimal pricePerHour = faker.Finance.Amount(10, 1000);
+            int capacity = faker.Random.Int(1, 20);
+            DateTime startDate = faker.Date.Recent();
+            DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
+            Guid creatorID = Guid.NewGuid();
 
             Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
 
@@ -27,7 +31,7 @@ namespace DomainTests
             Assert.AreEqual(type, property.Type);
             Assert.AreEqual(location, property.Location);
             Assert.AreEqual(contactPhone, property.ContactPhone);
-            Assert.AreEqual(contactName, property.ContactPhone);
+            Assert.AreEqual(contactName, property.ContactName);
             Assert.AreEqual(pricePerHour, property.PricePerHour);
             Assert.AreEqual(capacity, property.Capacity);
             Assert.AreEqual(startDate, property.StartDate);
@@ -38,34 +42,183 @@ namespace DomainTests
         [TestMethod]
         public void Edit_UpdatesProperties()
         {
-            Property property = new Property("Test Property", "Test Description", PropertyType.Apartment, "Test Location", "Ivan", "+380632123291", 50.00m, 5, DateTime.Now, DateTime.Now.AddDays(7), "user123");
+            string name = faker.Commerce.ProductName();
+            string description = faker.Lorem.Sentence();
+            PropertyType type = faker.PickRandom<PropertyType>();
+            string location = faker.Address.FullAddress();
+            string contactPhone = faker.Phone.PhoneNumber("+380#########");
+            string contactName = faker.Name.FirstName();
+            decimal pricePerHour = faker.Finance.Amount(10, 1000);
+            int capacity = faker.Random.Int(1, 20);
+            DateTime startDate = faker.Date.Recent();
+            DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
+            Guid creatorID = Guid.NewGuid();
+
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+
             PropertyDetails updateDetails = new PropertyDetails
             {
-                Name = "New Name",
-                Description = "New Description",
-                Type = PropertyType.House,
-                Location = "New Location",
-                PricePerHour = 60.00m,
-                Capacity = 6,
-                StartDate = DateTime.Now.AddDays(1),
-                EndDate = DateTime.Now.AddDays(8),
-                ContactPhone = "+380667123491",
-                ContactName = "Joe"
+                Name = faker.Commerce.ProductName(),
+                Description = faker.Lorem.Sentence(),
+                Type = faker.PickRandom<PropertyType>(),
+                Location = faker.Address.FullAddress(),
+                ContactPhone = faker.Phone.PhoneNumber("+380#########"),
+                ContactName = faker.Name.FirstName(),
+                PricePerHour = faker.Random.Decimal(10, 1000),
+                Capacity = faker.Random.Int(1, 20),
+                StartDate = faker.Date.Soon(),
+                EndDate = faker.Date.Soon(7),
             };
 
-            bool result = property.Edit(updateDetails);
+            property.Edit(updateDetails);
 
-            Assert.IsTrue(result);
             Assert.AreEqual(updateDetails.Name, property.Name);
             Assert.AreEqual(updateDetails.Description, property.Description);
             Assert.AreEqual(updateDetails.Type, property.Type);
             Assert.AreEqual(updateDetails.Location, property.Location);
             Assert.AreEqual(updateDetails.ContactPhone, property.ContactPhone);
-            Assert.AreEqual(updateDetails.ContactName, property.ContactPhone);
+            Assert.AreEqual(updateDetails.ContactName, property.ContactName);
             Assert.AreEqual(updateDetails.PricePerHour, property.PricePerHour);
             Assert.AreEqual(updateDetails.Capacity, property.Capacity);
             Assert.AreEqual(updateDetails.StartDate, property.StartDate);
             Assert.AreEqual(updateDetails.EndDate, property.EndDate);
+        }
+
+        [TestMethod]
+        public void Edit_ValidData()
+        {
+            PropertyDetails updateDetail = new PropertyDetails
+            {
+                Name = faker.Commerce.ProductName(),
+                Description = faker.Lorem.Sentence(),
+                Type = PropertyType.House,
+                Location = faker.Address.FullAddress(),
+                ContactPhone = faker.Phone.PhoneNumber("+380#########"),
+                ContactName = faker.Name.FirstName(),
+                PricePerHour = faker.Finance.Amount(10, 1000),
+                Capacity = faker.Random.Int(1, 20),
+                StartDate = faker.Date.Soon(),
+                EndDate = faker.Date.Soon(7),
+            };
+
+            string name = faker.Commerce.ProductName();
+            string description = faker.Lorem.Sentence();
+            PropertyType type = faker.PickRandom<PropertyType>();
+            string location = faker.Address.FullAddress();
+            string contactPhone = faker.Phone.PhoneNumber("+380#########");
+            string contactName = faker.Name.FirstName();
+            decimal pricePerHour = faker.Finance.Amount(10, 1000);
+            int capacity = faker.Random.Int(1, 20);
+            DateTime startDate = faker.Date.Recent();
+            DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
+            Guid creatorID = Guid.NewGuid();
+
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+
+            property.Edit(updateDetail);
+
+            var context = new ValidationContext(property, serviceProvider: null, items: null);
+            var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            var isValid = Validator.TryValidateObject(property, context, results, true);
+
+            Assert.IsTrue(isValid);         
+        }
+
+        [TestMethod]
+        public void Edit_ValidData_Null()
+        {
+            string name = faker.Commerce.ProductName();
+            string description = faker.Lorem.Sentence();
+            PropertyType type = faker.PickRandom<PropertyType>();
+            string location = faker.Address.FullAddress();
+            string contactPhone = faker.Phone.PhoneNumber("+380#########");
+            string contactName = faker.Name.FirstName();
+            decimal pricePerHour = faker.Finance.Amount(10, 1000);
+            int capacity = faker.Random.Int(1, 20);
+            DateTime startDate = faker.Date.Recent();
+            DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
+            Guid creatorID = Guid.NewGuid();
+
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+
+
+            property.Edit(new PropertyDetails());
+
+            var context = new ValidationContext(property, serviceProvider: null, items: null);
+            var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            var isValid = Validator.TryValidateObject(property, context, results, true);
+
+            Assert.IsTrue(isValid);          
+        }   
+        
+        [TestMethod]
+        public void Edit_InValidData()
+        {
+            string name = faker.Commerce.ProductName();
+            string description = faker.Lorem.Sentence();
+            PropertyType type = faker.PickRandom<PropertyType>();
+            string location = faker.Address.FullAddress();
+            string contactPhone = faker.Phone.PhoneNumber("+380#########");
+            string contactName = faker.Name.FirstName();
+            decimal pricePerHour = faker.Finance.Amount(10, 1000);
+            int capacity = faker.Random.Int(1, 20);
+            DateTime startDate = faker.Date.Recent();
+            DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
+            Guid creatorID = Guid.NewGuid();
+
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+
+
+            PropertyDetails updateDetail = new PropertyDetails
+            {
+                Name = faker.Commerce.ProductName(),
+                Description = faker.Lorem.Sentence(),
+                Type = PropertyType.House,
+                Location = faker.Address.FullAddress(),
+                ContactPhone = faker.Phone.PhoneNumber("+#########"),
+                ContactName = faker.Name.FirstName(),
+                PricePerHour = 0,
+                Capacity = -100,
+                StartDate = faker.Date.Soon(7),
+                EndDate = faker.Date.Soon(),
+            };
+
+            property.Edit(updateDetail);
+
+            var context = new ValidationContext(property, serviceProvider: null, items: null);
+            var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            var isValid = Validator.TryValidateObject(property, context, results, true);
+
+            Assert.IsFalse(isValid);
+
+            var expectedErrors = new Dictionary<string, string>
+            {
+                { nameof(Property.ContactPhone), "Invalid Ukrainian phone number" },
+                { nameof(Property.PricePerHour), "PricePerHour must be greater than 0" },
+                { nameof(Property.Capacity), "Capacity must be greater than 0" },
+                { nameof(Property.StartDate), "StartDate must be less than or equal to EndDate" },
+                { nameof(Property.EndDate), "EndDate must be greater than or equal to StartDate" }
+            };
+
+            foreach (var result in results)
+            {
+                foreach (var memberName in result.MemberNames)
+                {
+                    Assert.AreEqual(expectedErrors[memberName], result.ErrorMessage);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void CountTotalPrice_ValidInput()
+        {
+            decimal pricePerHour = 50.00m;
+            int numberOfDays = 7;
+            decimal expectedTotalPrice = 50.00m * 24 * 7;
+
+            decimal totalPrice = Property.CountTotalPrice(pricePerHour, numberOfDays);
+
+            Assert.AreEqual(expectedTotalPrice, totalPrice);
         }
     }
 }
