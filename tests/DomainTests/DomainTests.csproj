@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <Folder Include="BookingTests\" />
-    <Folder Include="UserTests\" />
     <Folder Include="PropertyTests\" />
     <Folder Include="ReviewTests\" />
   </ItemGroup>

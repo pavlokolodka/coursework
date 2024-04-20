@@ -1,14 +1,15 @@
-﻿using System.Diagnostics;
+﻿using Newtonsoft.Json;
 
 namespace ReserveSpot
 {
     public class UserCode : AbstractEntity
     {
-        public int Code { get; set; }
+        [JsonProperty]
+        public int? Code { get; private set; }
        
         public UserCode()
         {
-                     
+            Code = null;          
         }
 
         public int GenerateUserCode() {
