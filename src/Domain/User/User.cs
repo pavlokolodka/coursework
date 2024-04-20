@@ -1,11 +1,14 @@
 ﻿using System.Text;
 using System.Security.Cryptography;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace ReserveSpot
 {
     public class User : AbstractEntity
     {
+        [JsonProperty(PropertyName = "_userCode")]
         private UserCode userCode;
 
         [EmailAddress(ErrorMessage = "Invalid email address")]
@@ -21,20 +24,23 @@ namespace ReserveSpot
         public string LastName { get; set; }
 
         [Required(ErrorMessage = "IsAdmin is required")]
+        [JsonProperty]
         public bool IsAdmin { get; private set; }
 
         [Required(ErrorMessage = "IsVerified is required")]
         public bool IsVerified { get; set; }
-        public List<Property>? UserProperties { get; set; }
-        public List<Review>? UserReviews { get; set; }
-        public List<Booking>? UserBookings { get; set; }
+
+        //public List<Property>? UserProperties { get; set; }
+        //public List<Review>? UserReviews { get; set; }
+        //public List<Booking>? UserBookings { get; set; }
         public int? UserCode { get => userCode.Code; }
         public User(string email, string password, string firstName, string lastName)
         {
             Email = email;
             Password = password;
             FirstName = firstName;  
-            LastName = lastName;            
+            LastName = lastName;
+            userCode = new UserCode();  
         }
 
         public bool ComparePassword(string password) {
@@ -43,13 +49,10 @@ namespace ReserveSpot
 
         public bool IsValidUserCode()
         {
-            userCode ??= new UserCode();
             return userCode.ValidateUserCode();
         }
         public int GenerateUserCode()
         {
-            userCode ??= new UserCode(); 
-          
             return userCode.GenerateUserCode(); 
         }
 
