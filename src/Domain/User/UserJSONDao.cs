@@ -1,6 +1,5 @@
-﻿namespace ReserveSpot
+﻿namespace ReserveSpot.Domain
 {
-    using Domain;
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;

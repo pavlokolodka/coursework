@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using ReserveSpot;
+using ReserveSpot.Domain;
 
 namespace DomainTests
 {

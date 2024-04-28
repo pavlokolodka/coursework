@@ -1,4 +1,4 @@
-﻿namespace Domain
+﻿namespace ReserveSpot.Domain
 {
     public class DaoException : Exception
     {

@@ -1,4 +1,4 @@
-﻿using ReserveSpot;
+﻿using ReserveSpot.Domain;
 
 namespace DomainTests
 {

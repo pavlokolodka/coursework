@@ -1,4 +1,4 @@
-﻿namespace ReserveSpot
+﻿namespace ReserveSpot.Domain
 {
     public class DeleteBookingDto
     {

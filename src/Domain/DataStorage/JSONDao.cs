@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace ReserveSpot
+namespace ReserveSpot.Domain
 {
     abstract public class JSONDao<Entity>
     {

@@ -1,4 +1,5 @@
-﻿namespace ReserveSpot {
+﻿namespace ReserveSpot.Domain
+{
      public class DeleteReviewDto 
      {
         public string ReviewID { get; set; }

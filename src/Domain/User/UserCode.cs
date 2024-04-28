@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ReserveSpot
+namespace ReserveSpot.Domain
 {
     public class UserCode : AbstractEntity
     {

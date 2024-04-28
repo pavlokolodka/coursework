@@ -1,4 +1,5 @@
-﻿namespace ReserveSpot {
+﻿namespace ReserveSpot.Domain
+{
      public class CreatePropertyDto
     {
         public string Name { get; set; }
