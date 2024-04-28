@@ -1,4 +1,5 @@
-﻿namespace ReserveSpot {
+﻿namespace ReserveSpot.Domain
+{
      public class FindAllPropertiesDto
     {
         public string? Name { get; set; }

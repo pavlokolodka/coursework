@@ -1,6 +1,6 @@
 ﻿using ReserveSpot;
 
-namespace ReserveSpot
+namespace ReserveSpot.Domain
 {
     public class CreateBookingDto
     {

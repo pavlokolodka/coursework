@@ -1,5 +1,4 @@
-﻿using ReserveSpot;
-using System.Diagnostics;
+﻿using ReserveSpot.Domain;
 using System.Reflection;
 
 namespace DomainTests

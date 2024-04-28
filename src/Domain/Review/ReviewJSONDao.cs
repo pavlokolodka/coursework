@@ -1,6 +1,4 @@
-﻿using Domain;
-
-namespace ReserveSpot
+﻿namespace ReserveSpot.Domain
 {
     public class ReviewJSONDao : JSONDao<Review>, IDao<Review>
     {

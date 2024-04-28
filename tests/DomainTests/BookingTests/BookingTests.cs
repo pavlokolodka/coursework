@@ -1,4 +1,4 @@
-﻿using ReserveSpot;
+﻿using ReserveSpot.Domain;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 

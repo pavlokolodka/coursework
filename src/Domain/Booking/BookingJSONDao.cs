@@ -1,6 +1,4 @@
-﻿using Domain;
-
-namespace ReserveSpot
+﻿namespace ReserveSpot.Domain
 {
     public class BookingJSONDao : JSONDao<Booking>, IDao<Booking>
     {

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using Newtonsoft.Json;
 
-namespace ReserveSpot
+namespace ReserveSpot.Domain
 {
     public class User : AbstractEntity
     {

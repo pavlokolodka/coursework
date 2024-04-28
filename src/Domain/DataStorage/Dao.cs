@@ -1,4 +1,4 @@
-﻿namespace ReserveSpot
+﻿namespace ReserveSpot.Domain
 {
    public interface IDao<Entity>
     {

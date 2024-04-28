@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using DotNetEnv;
-using ReserveSpot;
+using ReserveSpot.Domain;
 
 namespace DomainTests
 {

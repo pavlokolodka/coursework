@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ReserveSpot
+namespace ReserveSpot.Domain
 {
     public class Review : AbstractEntity
     {
