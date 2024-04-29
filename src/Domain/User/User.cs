@@ -63,8 +63,6 @@ namespace ReserveSpot.Domain
         private string HashPassword(string password)
         {
             string secret = Environment.GetEnvironmentVariable("SECRET_KEY");
-           Console.WriteLine("SECRET");
-           Console.WriteLine(secret);
             byte[] secretBytes = Encoding.UTF8.GetBytes(secret);
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             byte[] combinedBytes = new byte[secretBytes.Length + passwordBytes.Length];

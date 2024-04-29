@@ -47,7 +47,6 @@ namespace DomainTests
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
                 Assert.IsTrue(ex is System.ComponentModel.DataAnnotations.ValidationException);               
             }       
         }
