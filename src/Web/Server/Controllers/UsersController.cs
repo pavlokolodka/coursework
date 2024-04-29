@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReserveSpot.Domain;
-using System.Diagnostics;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
-using Web.Shared.Dto;
 
 namespace Web.Server.Controllers
 {
@@ -14,10 +11,8 @@ namespace Web.Server.Controllers
     {
         private readonly UserService _userService;
         private readonly BookingService _bookingService;
-        private readonly AuthService _authService;
-        public UsersController(UserService userService, AuthService authService, BookingService bookingService) {
+        public UsersController(UserService userService, BookingService bookingService) {
             _userService = userService;
-            _authService = authService;
             _bookingService = bookingService;
         }
    
@@ -25,15 +20,10 @@ namespace Web.Server.Controllers
         [Authorize]
         public ActionResult<UserDto> Get()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
 
-            var user = _userService.FindOneById(userId); 
-            
-            if (user == null || user.IsAdmin == false) { 
+            if (isAdmin == false) { 
                 return Forbid();
             }
 
@@ -45,15 +35,10 @@ namespace Web.Server.Controllers
         [Authorize]
         public ActionResult<UserDto> Get(string id)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            var user = _userService.FindOneById(userId);
-
-            if (user == null || user.IsAdmin == false && !userId.Equals(id))
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+                       
+            if (isAdmin == false && !userId.Equals(id))
             {
                 return Forbid();
             }
@@ -72,12 +57,8 @@ namespace Web.Server.Controllers
         [Authorize]
         public ActionResult<UserDto> Me()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            
             var user = _userService.FindOneById(userId);
 
             if (user == null)
@@ -90,26 +71,19 @@ namespace Web.Server.Controllers
 
         [HttpPatch("{id}")]
         [Authorize]
-        public ActionResult<UserDto> Put(string id, [FromBody] UpdateUserDto payload)
+        public ActionResult<UserDto> UpdateUser(string id, [FromBody] UpdateUserDto payload)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;        
            
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-            
             if (!userId.Equals(id))
             {
-                return Forbid();
+                return new ObjectResult("Cannot update another user")
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
             }
 
-            var updatedUser = _userService.Update(id, payload);
-
-            if (updatedUser == null)
-            {
-                return NotFound();
-            }
+            var updatedUser = _userService.Update(id, payload);          
 
             return Ok(updatedUser);
         }
@@ -118,15 +92,10 @@ namespace Web.Server.Controllers
         [Authorize]
         public IActionResult Delete(string id)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
 
-            var user = _userService.FindOneById(userId);
-
-            if (user == null || user.IsAdmin == false && !userId.Equals(id))
+            if (isAdmin == false && !userId.Equals(id))
             {
                 return Forbid();
             }
@@ -138,12 +107,7 @@ namespace Web.Server.Controllers
             }
 
             var updatedUser = _userService.Delete(id);
-
-            if (!updatedUser)
-            {
-                return NotFound();
-            }
-
+                    
             return NoContent();
         }
     }    

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Web.Server;
+using Web.Server.Controllers;
+using Web.Server.Middlewares;
 
 Env.TraversePath().Load();
 
@@ -45,6 +47,12 @@ builder.Services.AddAuthentication(options =>
     options.IncludeErrorDetails = true;
 });
 
+builder.Services.AddAuthorization();
+
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 
@@ -64,6 +72,12 @@ else
     app.UseHsts();
 }
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+};
+
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
@@ -72,7 +86,11 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseMiddleware<AuthenticationMiddleware>();
+
 app.UseAuthorization();
+
+
 
 app.MapRazorPages();
 app.MapControllers();
