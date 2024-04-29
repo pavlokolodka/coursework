@@ -40,10 +40,6 @@ namespace DomainTests
 
             Assert.IsTrue(isValid);
 
-            foreach (var result in results)
-            {
-                Debug.WriteLine(result.ErrorMessage);
-            }
         }
 
         [TestMethod]
