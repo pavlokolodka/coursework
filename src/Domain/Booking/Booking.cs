@@ -13,10 +13,10 @@ namespace ReserveSpot.Domain
         [Required(ErrorMessage = "Status is required")]
         public BookingStatus Status { get; set; }
 
-        [StartDateLessThanOrEqualToEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
+        [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
         public DateTime StartDate { get; set; }
 
-        [EndDateGreaterThanOrEqualToStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
+        [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
 
         public Booking(DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {

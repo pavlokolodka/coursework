@@ -2,17 +2,17 @@
 
 namespace ReserveSpot
 {
-    public class EndDateGreaterThanOrEqualToStartDateAttribute : ValidationAttribute
+    public class EndDateGreaterThanStartDateAttribute : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var property = validationContext.ObjectType.GetProperty("StartDate");
-            if (property == null)
+            var property = validationContext.ObjectType.GetProperty("StartDate"); 
+            /*if (property == null)
             {
                 return new ValidationResult("Invalid property name.");
-            }
+            }*/
 
-            var startDate = (DateTime)property.GetValue(validationContext.ObjectInstance);
+            var startDate = (DateTime)(property.GetValue(validationContext.ObjectInstance) ?? DateTime.MinValue);
 
             if (value != null && (DateTime)value < startDate)
             {

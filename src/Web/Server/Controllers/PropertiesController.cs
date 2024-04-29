@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ReserveSpot.Domain;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace Web.Server.Controllers
 {
@@ -6,36 +10,66 @@ namespace Web.Server.Controllers
     [ApiController]
     public class PropertiesController : ControllerBase
     {
-        // GET: api/<PropertyController>
+        private readonly PropertyService _propertyService;
+        public PropertiesController(PropertyService propertyService)
+        {
+            _propertyService = propertyService;
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        public ActionResult<IEnumerable<Property>> GetAllProperties([FromQuery] FindAllPropertiesDto filter)
         {
-            return new string[] { "value1", "value2" };
+            var properties = _propertyService.FindAll(filter);
+            return Ok(properties);
         }
 
-        // GET api/<PropertyController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        /* [HttpGet]
+         [Authorize]
+         public ActionResult<Property> GetAllMyProperties()
+         {
+             return new string[] { "value1", "value2" };
+         }
 
-        // POST api/<PropertyController>
+
+         [HttpGet("{id}")]
+         public ActionResult<Property> GetOneProperty(int id)
+         {
+        string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+             bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+             return "value";
+         }*/
+
         [HttpPost]
-        public void Post([FromBody] string value)
+        [Authorize]
+        public ActionResult<Property> CreateProperty([FromBody] CreatePropertyDto dto)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            string format = "D"; // D represents the format 00000000-0000-0000-0000-000000000000
+            if (!Guid.TryParseExact(userId, format, out Guid guid))
+            {
+                return BadRequest("Invalid Guid format");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                Debug.WriteLine("invalid...");
+            }
+
+            var property = _propertyService.Create(guid, dto);    
+
+            return Ok(property);
+        }
+
+       /* [HttpPatch("{id}")]
+        [Authorize]
+        public ActionResult<Property> UpdateProperty(int id, [FromBody] string value)
         {
         }
 
-        // PUT api/<PropertyController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<PropertyController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [Authorize]
+        public ActionResult<Property> DeleteProperty(int id)
         {
-        }
+        }*/
     }
 }

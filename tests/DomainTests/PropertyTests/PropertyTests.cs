@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using ReserveSpot.Domain;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace DomainTests
 {
@@ -135,14 +136,18 @@ namespace DomainTests
             string contactName = faker.Name.FirstName();
             decimal pricePerHour = faker.Finance.Amount(10, 1000);
             int capacity = faker.Random.Int(1, 20);
-            DateTime startDate = faker.Date.Recent();
+            DateTime startDate = DateTime.Now.AddSeconds(1);
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
-
+            Debug.WriteLine($"start {startDate}");
+            Debug.WriteLine($"end {endDate}");
             Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
 
 
             property.Edit(new PropertyDetails());
+            Debug.WriteLine($"start {property.StartDate}");
+            Debug.WriteLine($"end {property.EndDate}");
+
 
             var context = new ValidationContext(property, serviceProvider: null, items: null);
             var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();

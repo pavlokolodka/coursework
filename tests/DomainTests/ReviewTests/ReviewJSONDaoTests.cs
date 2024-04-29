@@ -13,7 +13,7 @@ namespace DomainTests
         [TestMethod]
         public void Create()
         {
-            int rating = faker.Random.Number(0, 10);
+            int rating = faker.Random.Number(1, 10);
             string comment = faker.Lorem.Text();
             Guid userId = faker.Random.Uuid();
             Guid propertyId = faker.Random.Uuid(); 
@@ -59,7 +59,7 @@ namespace DomainTests
         [TestMethod]
         public void Update_Throws_Validation_Exception()
         {
-            int rating = faker.Random.Number(0, 10);
+            int rating = faker.Random.Number(1, 10);
             string comment = faker.Lorem.Text();
             Guid userId = faker.Random.Uuid();
             Guid propertyId = faker.Random.Uuid();

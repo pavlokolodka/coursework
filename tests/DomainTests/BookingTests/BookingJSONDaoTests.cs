@@ -10,8 +10,8 @@ namespace DomainTests
         [TestMethod]
         public void Create()
         {
-            DateTime startDate = new DateTime(2024, 4, 7);
-            DateTime endDate = new DateTime(2024, 4, 14);
+            DateTime startDate = DateTime.Now.AddSeconds(1);
+            DateTime endDate = startDate.AddDays(10);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             BookingJSONDao dao = new BookingJSONDao();
@@ -54,15 +54,15 @@ namespace DomainTests
         [TestMethod]
         public void Update()
         {
-            DateTime startDate = new DateTime(2024, 4, 7);
-            DateTime endDate = new DateTime(2024, 4, 7);
+            DateTime startDate = DateTime.Now.AddSeconds(1);
+            DateTime endDate = startDate.AddDays(10);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             BookingJSONDao dao = new BookingJSONDao();
             Booking newBooking = new Booking(startDate, endDate, userId, propertyId);
             dao.Create(newBooking);
 
-            DateTime newEndDate = new DateTime(2024, 4, 17);
+            DateTime newEndDate = endDate.AddHours(1);
             newBooking.Edit(null, newEndDate);
             var updatedBooking = dao.Update(booking => booking.ID == newBooking.ID, newBooking);
 
