@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Web.Server;
@@ -12,6 +13,18 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 ServiceConfigurator.ConfigureServices(builder.Services);
 
+// global validation
+builder.Services.AddControllers()
+           .ConfigureApiBehaviorOptions(options =>
+           {
+               options.InvalidModelStateResponseFactory = context =>
+               {
+                   var result = new BadRequestObjectResult(context.ModelState);
+                            
+                   return result;
+               };
+           });
+// global authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

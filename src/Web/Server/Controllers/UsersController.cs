@@ -146,10 +146,5 @@ namespace Web.Server.Controllers
 
             return NoContent();
         }
-    }
-    public class JWTResponse
-    {
-        [JsonPropertyName("access_token")]
-        public string AcessToken { get; set; }
-    }
+    }    
 }

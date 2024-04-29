@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReserveSpot.Domain;
+using System.Text.Json.Serialization;
 using Web.Shared.Dto;
 
 namespace Web.Server.Controllers
@@ -20,10 +21,10 @@ namespace Web.Server.Controllers
         [HttpPost("register")]
         public ActionResult<JWTResponse> Register([FromBody] CreateUserDto payload)
         {
-            if (!ModelState.IsValid)
+            /*if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
+            }*/
 
             var user = _userService.FindOneByEmail(payload.Email);
 
@@ -44,10 +45,10 @@ namespace Web.Server.Controllers
         [HttpPost("login")]
         public ActionResult<JWTResponse> Login([FromBody] LoginDto payload)
         {
-            if (!ModelState.IsValid)
+           /* if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
+            }*/
 
             var userEmail = payload.Email;
             var userPassword = payload.Password;
@@ -62,5 +63,10 @@ namespace Web.Server.Controllers
 
             return Ok(new JWTResponse() { AcessToken = jwt });
         }
+    }
+    public class JWTResponse
+    {
+        [JsonPropertyName("access_token")]
+        public string AcessToken { get; set; }
     }
 }

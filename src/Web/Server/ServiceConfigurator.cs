@@ -16,27 +16,8 @@ namespace Web.Server
             services.AddSingleton<IDao<Property>, PropertyJSONDao>();
             services.AddSingleton<IDao<Booking>, BookingJSONDao>();
 
-            services.AddSingleton<AuthService>();
-
-            services.AddControllers()
-           .ConfigureApiBehaviorOptions(options =>
-           {
-               options.InvalidModelStateResponseFactory = context =>
-               {
-                   var result = new BadRequestObjectResult(context.ModelState);
-
-                   // TODO: add additional logic here if needed
-
-                   return result;
-               };
-           });
-
-            /*      services.AddControllers()
-            .ConfigureApiBehaviorOptions(options =>
-            {
-                options.SuppressModelStateInvalidFilter = false;
-            });*/
-
+            services.AddSingleton<AuthService>();       
+                     
         }
     }
 }
