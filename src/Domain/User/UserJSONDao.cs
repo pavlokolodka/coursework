@@ -81,6 +81,7 @@
                 var index = users.FindIndex(where);
                 if (index != -1)
                 {
+                    entity.UpdatedAt = DateTime.Now;
                     users[index] = entity;
                     SaveEntities(users);
                     return entity;
@@ -93,54 +94,6 @@
                 throw new DaoException(ex.Message);
             }
         }
-
-      /*  private List<User> LoadUsers()
-        {
-            if (!File.Exists(filePath))
-            {
-                return new List<User>();
-            }
-
-            var json = File.ReadAllText(filePath);
-            return JsonConvert.DeserializeObject<List<User>>(json);
-        }
-
-        private bool ValidateObject(User user)
-        {
-            var context = new ValidationContext(user, serviceProvider: null, items: null);
-            var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
-            var isValid = Validator.TryValidateObject(user, context, results, true);
-
-            if (!isValid)
-            {
-                var errorMessages = results.Select(r => string.Join(Environment.NewLine, r.MemberNames.Select(m => $"{m}: {r.ErrorMessage}")));
-
-                throw new ValidationException(string.Join(Environment.NewLine, errorMessages));
-            }
-
-            return true;
-        }
-
-
-        private void SaveUsers(List<User> users)
-        {
-                //Console.WriteLine($"user? {users.First().LastName}");
-                JsonSerializerSettings settings = new JsonSerializerSettings
-                {
-                    Formatting = Formatting.Indented,
-                    ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()
-                };
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(users, settings);
-                string directoryPath = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(directoryPath))
-                {
-                    Directory.CreateDirectory(directoryPath);
-                }
-
-                File.WriteAllText(filePath, json);
-           
-                
-        }*/
     }
 
 }
