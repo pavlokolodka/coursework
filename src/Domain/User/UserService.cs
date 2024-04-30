@@ -16,6 +16,13 @@ namespace ReserveSpot.Domain
 
         public UserDto Create(CreateUserDto payload)
         {
+            var userWithEmail = userDao.FindOne(user => user.Email == payload.Email);
+
+            if (userWithEmail != null)
+            {
+                throw new InvalidOperationException("User with this email already exists");               
+            }
+
             var newUser = new User(payload.Email, payload.Password, payload.FirstName, payload.LastName);
             newUser.HashPassword();
             var user = userDao.Create(newUser);

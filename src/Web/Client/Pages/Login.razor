@@ -1,0 +1,161 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations;
+@using System.Text.Json.Serialization;
+@using Blazored.LocalStorage;
+@using Web.Shared.Dto;
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+<style>
+    html, body {
+    height: 100%;
+    overflow-x: hidden;
+    margin: 0; 
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10%;
+    margin-bottom: auto;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    width: 100%;
+    min-width: 400px;
+    min-height: 50px; 
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+</style>
+
+
+
+<div class="login-container">
+    <h3>Login</h3>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+            <div class="alert alert-danger">
+            @errorMessage
+            </div>
+    }
+
+    <EditForm OnValidSubmit="@HandleLogin" EditContext="@editContext">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <InputText id="email" class="form-control" @bind-Value="loginModel.Email" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <InputText id="password" type="password" class="form-control" @bind-Value="loginModel.Password" />
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Login</button>
+        </div>
+
+         <div class="form-group">
+        <p>
+            Don't have an account? <NavLink href="register">Register</NavLink>
+        </p>
+    </div>
+    </EditForm>
+</div>
+
+
+@code {
+    private LoginDto loginModel = new LoginDto();
+    private EditContext editContext;
+    private bool isFormInvalid = true;
+    private string errorMessage = ""; 
+
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(loginModel);
+        editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        errorMessage = "";
+        isFormInvalid = !editContext.Validate();
+        StateHasChanged();
+    }
+
+    private async Task HandleLogin()
+    {       
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/login", loginModel);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<LoginResult>();
+                Console.WriteLine($"Result: {result.AccessToken}");
+                await LocalStorage.SetItemAsync("authToken", result.AccessToken);
+                NavigationManager.NavigateTo("/properties");
+                // Handle success, e.g., navigate to another page or show success message
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+                errorMessage = "Wrong email or password";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Network Error: {ex.Message}");
+        }
+    }
+
+    public void Dispose()
+    {
+        // Clean up to avoid memory leaks
+        editContext.OnFieldChanged -= HandleFieldChanged;
+    }
+
+    public class LoginModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required, DataType(DataType.Password)]
+        public string Password { get; set; }
+    }   
+}

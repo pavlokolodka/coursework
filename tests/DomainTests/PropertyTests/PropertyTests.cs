@@ -57,7 +57,7 @@ namespace DomainTests
 
             Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
 
-            PropertyDetails updateDetails = new PropertyDetails
+            UpdatePropertyDto updateDetails = new UpdatePropertyDto
             {
                 Name = faker.Commerce.ProductName(),
                 Description = faker.Lorem.Sentence(),
@@ -88,7 +88,7 @@ namespace DomainTests
         [TestMethod]
         public void Edit_ValidData()
         {
-            PropertyDetails updateDetail = new PropertyDetails
+            UpdatePropertyDto updateDetail = new UpdatePropertyDto
             {
                 Name = faker.Commerce.ProductName(),
                 Description = faker.Lorem.Sentence(),
@@ -144,7 +144,7 @@ namespace DomainTests
             Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
 
 
-            property.Edit(new PropertyDetails());
+            property.Edit(new UpdatePropertyDto());
             Debug.WriteLine($"start {property.StartDate}");
             Debug.WriteLine($"end {property.EndDate}");
 
@@ -174,7 +174,7 @@ namespace DomainTests
             Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
 
 
-            PropertyDetails updateDetail = new PropertyDetails
+            UpdatePropertyDto updateDetail = new UpdatePropertyDto
             {
                 Name = faker.Commerce.ProductName(),
                 Description = faker.Lorem.Sentence(),

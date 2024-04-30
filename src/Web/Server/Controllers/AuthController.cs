@@ -19,15 +19,25 @@ namespace Web.Server.Controllers
         }
         
         [HttpPost("register")]
-        public ActionResult<JWTResponse> Register([FromBody] CreateUserDto payload)
+        public ActionResult<JWTResponse> Register([FromBody] ReserveSpot.Domain.CreateUserDto payload)
         {
-            var user = _userService.FindOneByEmail(payload.Email);
+            UserDto createdUser;
+            try
+            {
+                createdUser = _userService.Create(payload);
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                if (ex is InvalidOperationException)
+                {
+                    return Conflict("User with this email already exists");
+                }
 
-            if (user != null) {
-                return Conflict("User with this email already exists");
-            }
-
-            var createdUser = _userService.Create(payload);
+                return new ObjectResult("Internal Server Error")
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }           
             
             // TODO: Add email verification
             _userService.VerifyUser(createdUser.ID.ToString());
