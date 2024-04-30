@@ -1,5 +1,4 @@
 ﻿using ReserveSpot.Domain;
-using System.Diagnostics;
 using System.Security.Claims;
 
 namespace Web.Server.Middlewares
@@ -17,12 +16,8 @@ namespace Web.Server.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            Debug.WriteLine("debug");
-
-
             if (context.User.Identity.IsAuthenticated)
             {
-                Debug.WriteLine("IsAuthenticated");
                 var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId != null)
                 {
@@ -43,7 +38,6 @@ namespace Web.Server.Middlewares
                     return; 
                 }
             }
-            Debug.WriteLine("_next");
             await _next(context);
         }
     }

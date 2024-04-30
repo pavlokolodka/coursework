@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReserveSpot.Domain;
-using System.Diagnostics;
+using ReserveSpot.Domain.Common;
 using System.Security.Claims;
 
 namespace Web.Server.Controllers
@@ -23,53 +23,115 @@ namespace Web.Server.Controllers
             return Ok(properties);
         }
 
-        /* [HttpGet]
-         [Authorize]
-         public ActionResult<Property> GetAllMyProperties()
-         {
-             return new string[] { "value1", "value2" };
-         }
+        [HttpGet("my")]
+        [Authorize]
+        public ActionResult<IEnumerable<Property>> GetAllMyProperties()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+         
+            var properties = _propertyService.FindAllByUserId(userId);
+            return Ok(properties);
+        }
 
 
-         [HttpGet("{id}")]
-         public ActionResult<Property> GetOneProperty(int id)
-         {
-        string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-             bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
-             return "value";
-         }*/
+        [HttpGet("{id}")]
+        public ActionResult<Property> GetProperty(string id)
+        {
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+
+            var property = _propertyService.Find(id);
+            if (property == null) return NotFound("Property not found");
+            return Ok(property);
+        }
 
         [HttpPost]
         [Authorize]
         public ActionResult<Property> CreateProperty([FromBody] CreatePropertyDto dto)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            string format = "D"; // D represents the format 00000000-0000-0000-0000-000000000000
-            if (!Guid.TryParseExact(userId, format, out Guid guid))
+            var guid = Validator.StringToGuild(userId);
+            if (guid == null)
             {
                 return BadRequest("Invalid Guid format");
             }
 
-            if (!ModelState.IsValid)
-            {
-                Debug.WriteLine("invalid...");
-            }
+            var property = _propertyService.Create((Guid)guid, dto);
 
-            var property = _propertyService.Create(guid, dto);    
+            string url = Url.Action("GetProperty", new { id = property.ID });
 
-            return Ok(property);
+            return Created(url, property);
         }
 
-       /* [HttpPatch("{id}")]
+        [HttpPatch("{id}")]
         [Authorize]
-        public ActionResult<Property> UpdateProperty(int id, [FromBody] string value)
+        public ActionResult<Property> UpdateProperty(string id, [FromBody] UpdatePropertyDto dto)
         {
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+         
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+          
+            try
+            {
+                var updatedProperty = _propertyService.Update(userId, id, dto, isAdmin);
+                return Ok(updatedProperty);
+            } catch (Exception ex)
+            {
+                if (ex is AccessViolationException)
+                {
+                    return Forbid();
+                }
+
+                if (ex is InvalidOperationException)
+                {
+                    return NotFound();
+                }
+
+                return new ObjectResult("Internal Server Error")
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
         }
 
         [HttpDelete("{id}")]
         [Authorize]
-        public ActionResult<Property> DeleteProperty(int id)
+        public ActionResult<Property> DeleteProperty(string id)
         {
-        }*/
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+            try
+            {
+                bool isDeleted = _propertyService.Delete(userId, id, isAdmin);
+                return NoContent();
+            } catch(Exception ex)
+            {
+                if (ex is AccessViolationException)
+                {
+                    return Forbid();
+                }
+
+                if (ex is InvalidOperationException)
+                {
+                    return NotFound();
+                }
+                return new ObjectResult("Internal Server Error")
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+            
+        }
     }
 }

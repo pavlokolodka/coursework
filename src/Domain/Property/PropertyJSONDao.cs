@@ -72,6 +72,7 @@
                 var index = properties.FindIndex(where);
                 if (index != -1)
                 {
+                    entity.UpdatedAt = DateTime.Now;
                     properties[index] = entity;
                     SaveEntities(properties);
                     return entity;

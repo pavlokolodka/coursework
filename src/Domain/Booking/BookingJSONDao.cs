@@ -72,6 +72,7 @@
                 var index = bookings.FindIndex(where);
                 if (index != -1)
                 {
+                    entity.UpdatedAt = DateTime.Now;
                     bookings[index] = entity;
                     SaveEntities(bookings);
                     return entity;

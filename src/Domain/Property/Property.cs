@@ -65,7 +65,7 @@ namespace ReserveSpot.Domain
             UserID = creatorID;      
         }             
 
-        public void Edit(PropertyDetails updateDetail)
+        public void Edit(UpdatePropertyDto updateDetail)
         {
             Name = updateDetail.Name ?? Name;
             Description = updateDetail.Description ?? Description;
