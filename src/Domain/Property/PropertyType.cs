@@ -1,4 +1,6 @@
-﻿namespace ReserveSpot.Domain
+﻿using System.ComponentModel;
+
+namespace ReserveSpot.Domain
 {
     public enum PropertyType
     {

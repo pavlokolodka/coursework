@@ -72,6 +72,7 @@
                 var index = reviews.FindIndex(where);
                 if (index != -1)
                 {
+                    entity.UpdatedAt = DateTime.Now;
                     reviews[index] = entity;
                     SaveEntities(reviews);
                     return entity;

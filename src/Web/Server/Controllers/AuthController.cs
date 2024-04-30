@@ -21,11 +21,6 @@ namespace Web.Server.Controllers
         [HttpPost("register")]
         public ActionResult<JWTResponse> Register([FromBody] CreateUserDto payload)
         {
-            /*if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }*/
-
             var user = _userService.FindOneByEmail(payload.Email);
 
             if (user != null) {
@@ -45,11 +40,6 @@ namespace Web.Server.Controllers
         [HttpPost("login")]
         public ActionResult<JWTResponse> Login([FromBody] LoginDto payload)
         {
-           /* if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }*/
-
             var userEmail = payload.Email;
             var userPassword = payload.Password;
             var user = _userService.FindUserAndComparePassword(userEmail, userPassword);

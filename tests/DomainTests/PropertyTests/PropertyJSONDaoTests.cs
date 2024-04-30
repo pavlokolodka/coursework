@@ -19,7 +19,7 @@ namespace DomainTests
             string contactName = faker.Name.FirstName();
             decimal pricePerHour = faker.Finance.Amount(10, 1000);
             int capacity = faker.Random.Int(1, 20);
-            DateTime startDate = faker.Date.Recent();
+            DateTime startDate = DateTime.Now.AddSeconds(1);
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
             var dao = new PropertyJSONDao();

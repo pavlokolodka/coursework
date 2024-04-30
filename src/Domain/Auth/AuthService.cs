@@ -23,7 +23,7 @@ namespace ReserveSpot.Domain
             var token = new JwtSecurityToken(
                 issuer: "ReserveSpot",
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(60),
+                expires: DateTime.Now.AddMinutes(600),
                 signingCredentials: credentials
             );
 

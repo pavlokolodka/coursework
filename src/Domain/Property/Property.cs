@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 
 namespace ReserveSpot.Domain
 {
@@ -11,6 +13,7 @@ namespace ReserveSpot.Domain
         public string Description { get; set; }
 
         [Required(ErrorMessage = "Type is required")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public PropertyType Type { get; set; }
 
         [Required(ErrorMessage = "Location is required")]
@@ -29,10 +32,10 @@ namespace ReserveSpot.Domain
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
         public int Capacity { get; set; }
 
-        [StartDateLessThanOrEqualToEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
+        [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
         public DateTime StartDate { get; set; }
 
-        [EndDateGreaterThanOrEqualToStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
+        [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
 
         [Required(ErrorMessage = "UserID is required")]
@@ -62,7 +65,7 @@ namespace ReserveSpot.Domain
             UserID = creatorID;      
         }             
 
-        public void Edit(PropertyDetails updateDetail)
+        public void Edit(UpdatePropertyDto updateDetail)
         {
             Name = updateDetail.Name ?? Name;
             Description = updateDetail.Description ?? Description;

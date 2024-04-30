@@ -1,0 +1,137 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ReserveSpot.Domain;
+using ReserveSpot.Domain.Common;
+using System.Security.Claims;
+
+namespace Web.Server.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PropertiesController : ControllerBase
+    {
+        private readonly PropertyService _propertyService;
+        public PropertiesController(PropertyService propertyService)
+        {
+            _propertyService = propertyService;
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<Property>> GetAllProperties([FromQuery] FindAllPropertiesDto filter)
+        {
+            var properties = _propertyService.FindAll(filter);
+            return Ok(properties);
+        }
+
+        [HttpGet("my")]
+        [Authorize]
+        public ActionResult<IEnumerable<Property>> GetAllMyProperties()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+         
+            var properties = _propertyService.FindAllByUserId(userId);
+            return Ok(properties);
+        }
+
+
+        [HttpGet("{id}")]
+        public ActionResult<Property> GetProperty(string id)
+        {
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+
+            var property = _propertyService.Find(id);
+            if (property == null) return NotFound("Property not found");
+            return Ok(property);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public ActionResult<Property> CreateProperty([FromBody] CreatePropertyDto dto)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var guid = Validator.StringToGuild(userId);
+            if (guid == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+
+            var property = _propertyService.Create((Guid)guid, dto);
+
+            string url = Url.Action("GetProperty", new { id = property.ID });
+
+            return Created(url, property);
+        }
+
+        [HttpPatch("{id}")]
+        [Authorize]
+        public ActionResult<Property> UpdateProperty(string id, [FromBody] UpdatePropertyDto dto)
+        {
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+         
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+          
+            try
+            {
+                var updatedProperty = _propertyService.Update(userId, id, dto, isAdmin);
+                return Ok(updatedProperty);
+            } catch (Exception ex)
+            {
+                if (ex is AccessViolationException)
+                {
+                    return Forbid();
+                }
+
+                if (ex is InvalidOperationException)
+                {
+                    return NotFound();
+                }
+
+                return new ObjectResult("Internal Server Error")
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public ActionResult<Property> DeleteProperty(string id)
+        {
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+            try
+            {
+                bool isDeleted = _propertyService.Delete(userId, id, isAdmin);
+                return NoContent();
+            } catch(Exception ex)
+            {
+                if (ex is AccessViolationException)
+                {
+                    return Forbid();
+                }
+
+                if (ex is InvalidOperationException)
+                {
+                    return NotFound();
+                }
+                return new ObjectResult("Internal Server Error")
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+            
+        }
+    }
+}

@@ -27,8 +27,8 @@ namespace DomainTests
         [TestMethod]
         public void ValidateObject_ValidBooking()
         {
-            DateTime startDate = new DateTime(2024, 4, 7);
-            DateTime endDate = new DateTime(2024, 4, 14);
+            DateTime startDate = DateTime.Now.AddSeconds(1);
+            DateTime endDate = startDate.AddDays(10);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
 
@@ -76,13 +76,13 @@ namespace DomainTests
         [TestMethod]
         public void Edit_UpdatesBookingDates_Valid()
         {
-            DateTime startDate = new DateTime(2024, 4, 7);
-            DateTime endDate = new DateTime(2024, 4, 14);
+            DateTime startDate = DateTime.Now.AddSeconds(1);
+            DateTime endDate = startDate.AddDays(10);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             Booking booking = new Booking(startDate, endDate, userId, propertyId);
-            DateTime newStartDate = new DateTime(2024, 4, 10);
-            DateTime newEndDate = new DateTime(2024, 4, 17);
+            DateTime newStartDate = startDate.AddDays(10);
+            DateTime newEndDate = endDate.AddDays(10);
 
             booking.Edit(newStartDate, newEndDate);
             var context = new ValidationContext(booking);
