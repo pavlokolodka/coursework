@@ -1,0 +1,165 @@
+﻿@page "/register"
+@using System.ComponentModel.DataAnnotations;
+@using Blazored.LocalStorage;
+@using Web.Shared.Dto;
+@inject HttpClient Http
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+
+<style>
+.registration-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%; 
+    max-width: 500px; 
+    margin: 0 auto; 
+    margin-top: 5%;
+    
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100%; 
+    min-width: 450px;
+}
+
+.alert {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+</style>
+
+
+<div class="registration-container">
+    <h3>Register</h3>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+            <div class="alert alert-danger">
+            @errorMessage
+            </div>
+    }
+
+    <EditForm EditContext="@editContext" OnValidSubmit="@HandleRegistration">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <InputText id="email" class="form-control" @bind-Value="registrationModel.Email" />
+        </div>
+
+        <div class="form-group">
+            <label for="first-name">First name:</label>
+            <InputText id="first-name" class="form-control" @bind-Value="registrationModel.FirstName" />
+        </div>
+
+        <div class="form-group">
+            <label for="last-name">Last name:</label>
+            <InputText id="last-name" class="form-control" @bind-Value="registrationModel.LastName" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <InputText id="password" type="password" class="form-control" @bind-Value="registrationModel.Password" />
+        </div>
+
+     @*    <div class="form-group">
+            <label for="confirm-password">Confirm password:</label>
+            <InputText id="confirm-password" type="password" class="form-control" @bind-Value="ConfirmPassword" />
+        </div> *@
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success" disabled="@isFormInvalid">Register</button>
+        </div>
+    </EditForm>
+</div>
+
+
+@code {
+    private EditContext editContext;
+    private string errorMessage = "";
+    private bool isFormInvalid = true;
+    private CreateUserDto registrationModel = new CreateUserDto();
+    [Required(ErrorMessage = "Password is required")]
+    [StringLength(100, ErrorMessage = "The password must be at least 8 characters long.", MinimumLength = 8)]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,100}$", ErrorMessage = "The password must contain at least one lowercase letter, one uppercase letter, and one number.")]
+    private string ConfirmPassword { get; set; }
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(registrationModel);
+        editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        errorMessage = "";
+        isFormInvalid = !editContext.Validate();
+        StateHasChanged();
+    }
+
+    private async Task HandleRegistration()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/register", registrationModel);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<LoginResult>();
+                Console.WriteLine($"Result: {result.AccessToken}");
+                await LocalStorage.SetItemAsync("authToken", result.AccessToken);
+                NavigationManager.NavigateTo("/properties");
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+                var statusCode = response.StatusCode;
+                if (statusCode == System.Net.HttpStatusCode.Conflict)
+                {
+                    errorMessage = "A user with the specified e-mail address already exists";
+                    return;
+                }
+
+                errorMessage = "Something went wrong";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Network Error: {ex.Message}");
+            errorMessage = "Something went wrong";
+        }
+    }
+
+    private class CreateUserDto
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required")]
+        [StringLength(100, ErrorMessage = "The password must be at least 8 characters long.", MinimumLength = 8)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,100}$", ErrorMessage = "The password must contain at least one lowercase letter, one uppercase letter, and one number.")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "First name is required")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Last name is required")]
+        public string LastName { get; set; }
+
+    }
+}
