@@ -40,10 +40,7 @@ namespace ReserveSpot.Domain
 
         [Required(ErrorMessage = "UserID is required")]
         public Guid UserID { get; set; }
-
-        public List<Review>? PropertyReviews { get; set; }
-        public List<Booking>? PropertyBooking { get; set; }
-
+               
         public static int PropetryCount;
         public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
         {

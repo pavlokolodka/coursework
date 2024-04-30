@@ -1,8 +1,8 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations;
 @using System.Text.Json.Serialization;
-@using Blazored.LocalStorage;
 @using Web.Shared.Dto;
+@using Blazored.LocalStorage;
 @inject HttpClient Http
 @inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
@@ -126,10 +126,8 @@ button:hover {
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResult>();
-                Console.WriteLine($"Result: {result.AccessToken}");
                 await LocalStorage.SetItemAsync("authToken", result.AccessToken);
                 NavigationManager.NavigateTo("/properties");
-                // Handle success, e.g., navigate to another page or show success message
             }
             else
             {
