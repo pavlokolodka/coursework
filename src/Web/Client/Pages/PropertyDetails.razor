@@ -1,0 +1,86 @@
+﻿@page "/property-details/{PropertyId}"
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using Web.Shared.Dto;
+@inject HttpClient Http
+
+<style>
+.property-details-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.image-container {
+    flex: 1 1 300px; 
+    max-width: 300px;
+}
+
+.image-container img {
+    width: 100%; 
+    height: auto;
+    border-radius: 8px; 
+}
+
+.info-container {
+    flex: 3 1 600px; 
+    padding-left: 20px; 
+    max-width: 600px;
+}
+
+.description-container {
+    width: 100%; 
+    margin-top: 20px; 
+    padding: 10px;
+}
+
+.property-details-container p, .property-details-container h3 {
+    margin: 5px 0; 
+}
+</style>
+
+
+@code {
+    [Parameter]
+    public string PropertyId { get; set; }
+
+    private PropertyModel property;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        property = await Http.GetFromJsonAsync<PropertyModel>($"api/properties/{PropertyId}", options);
+    }
+}
+
+@if (property != null)
+{
+       
+        <div class="property-details-container">
+    <div class="image-container">
+        <img src="https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?cs=srgb&dl=pexels-binyaminmellish-186077.jpg&fm=jpg" alt="Property Image" />
+
+    </div>
+    <div class="info-container">
+        <h3>@property.Name</h3>
+        <p><strong>Type:</strong> @property.Type</p>
+        <p><strong>Location:</strong> @property.Location</p>
+        <p><strong>Contact:</strong> @property.ContactName (@property.ContactPhone)</p>
+        <p><strong>Price Per Hour:</strong> $@property.PricePerHour</p>
+        <p><strong>Capacity:</strong> @property.Capacity</p>
+        <p><strong>Available Dates:</strong> @property.StartDate.ToShortDateString() - @property.EndDate.ToShortDateString()</p>
+    </div>
+    <div class="description-container">
+                <h3>Description:</h3>
+        <p>@property.Description</p>
+    </div>
+</div>
+}
+else
+{
+        <p>Loading property details...</p>
+}

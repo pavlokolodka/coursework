@@ -42,6 +42,8 @@ namespace Web.Shared.Dto
 		[Required(ErrorMessage = "UserID is required")]
 		public Guid UserID { get; set; }
 
+		public Guid ID { get; set; }	
+
 		public static int PropetryCount;
 		public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
 		{

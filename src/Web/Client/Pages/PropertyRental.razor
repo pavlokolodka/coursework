@@ -1,4 +1,4 @@
-﻿@page "/properties"
+﻿@page "/rental"
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
 @using Web.Shared.Dto;
@@ -6,6 +6,7 @@
 @using Web.Shared;
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage
 
 <style>
 .search-bar {
@@ -65,6 +66,26 @@
     margin-top: 0;
 }
 
+.floating-button {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
+}
+
+.floating-button:hover {
+    background-color: #0056b3;
+}
+
+
 </style>
 
 
@@ -114,6 +135,7 @@
             </div>
     }
 </div>
+<button @onclick="NavigateToAddProperty" class="floating-button">Add Property</button>
 
 
 @code {
@@ -140,9 +162,23 @@
                 PropertyNameCaseInsensitive = true,
                 Converters = { new JsonStringEnumConverter() }
             };
-        try
+        try       
         {
-            filteredProperties = await Http.GetFromJsonAsync<List<PropertyModel>>("api/properties", options);
+            
+            string token = await LocalStorage.GetItemAsStringAsync("authToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/properties/my");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
+            var response = await Http.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            filteredProperties = JsonSerializer.Deserialize<List<PropertyModel>>(json, options);
+            //filteredProperties = await Http.GetFromJsonAsync<List<PropertyModel>>("api/properties/my", options);
         } catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
@@ -212,4 +248,5 @@
     }
 
     private void NavigateToDetails(string propertyId) => NavigationManager.NavigateTo($"/property-details/{propertyId}");
+    private void NavigateToAddProperty() => NavigationManager.NavigateTo("/add-property");
 }

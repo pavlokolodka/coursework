@@ -37,11 +37,12 @@
                     <NavLink class="nav-link" href="properties">
                         Properties
                     </NavLink>
-                    <NavLink class="nav-link" href="rental">
-                        Property Rental
-                    </NavLink>
+                    
                     @if (isLoggedIn)
                     {
+                        <NavLink class="nav-link" href="rental">
+                            Property Rental
+                        </NavLink>
                        <NavLink class="nav-link" href="" @onclick="Logout">Logout</NavLink>
                     }
                     else
@@ -67,6 +68,9 @@
         if (!string.IsNullOrEmpty(token))
         {
             isLoggedIn = true;
+        } else
+        {
+            NavigationManager.NavigateTo("/login", forceLoad: true);
         }
     }
 
