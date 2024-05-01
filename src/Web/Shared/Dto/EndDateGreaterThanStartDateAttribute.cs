@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ReserveSpot
+namespace Web.Shared.Dto
 {
     public class EndDateGreaterThanStartDateAttribute : ValidationAttribute
     {
@@ -14,7 +14,7 @@ namespace ReserveSpot
 
             var startDate = (DateTime)(property.GetValue(validationContext.ObjectInstance) ?? DateTime.MinValue);
 
-            if (value != null && (DateTime)value < startDate)
+            if (value != null && (DateTime)value < startDate.AddDays(1))
             {
                 return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
             }

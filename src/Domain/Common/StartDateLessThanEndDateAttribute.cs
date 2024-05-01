@@ -8,14 +8,11 @@ namespace ReserveSpot
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var property = validationContext.ObjectType.GetProperty("EndDate");
-            /*if (property == null)
-            {
-                return new ValidationResult("Invalid property name.");
-            }*/
-
+         
             var endDate = (DateTime)(property.GetValue(validationContext.ObjectInstance) ?? DateTime.MaxValue);
 
-            if (value != null && ((DateTime)value > endDate || (DateTime)value < DateTime.Now))
+            //add days -1 to compare starting from 00:00:00
+            if (value != null && ((DateTime)value >= endDate || ((DateTime)value) < DateTime.Now.AddDays(-1)))
             {
                 return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
             }

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using ReserveSpot;
 using System.ComponentModel.DataAnnotations;
 
 namespace Web.Shared.Dto
@@ -27,7 +26,12 @@ namespace Web.Shared.Dto
 		[Required(ErrorMessage = "ContactName is required")]
 		public string ContactName { get; set; }
 
-		[Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
+        [Required(ErrorMessage = "ImageUrl is required")]
+        [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
+        public string ImageUrl { get; set; }
+
+
+        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
 		public decimal PricePerHour { get; set; }
 
 		[Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]

@@ -99,7 +99,8 @@
     {
                 <div class="property-item" @onclick="() => NavigateToDetails(property.ID.ToString())" style="cursor: pointer;">
                 <div class="image-block">
-                        <img src="https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?cs=srgb&dl=pexels-binyaminmellish-186077.jpg&fm=jpg" alt="Property Image"/>
+                        @* <img src="https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?cs=srgb&dl=pexels-binyaminmellish-186077.jpg&fm=jpg" alt="Property Image"/> *@
+                        <img src="@property.ImageUrl" alt="Property Image"/>
                 </div>
                 <div class="property-details">
                     <h4>@property.Name</h4>
