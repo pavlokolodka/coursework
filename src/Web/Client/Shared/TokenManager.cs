@@ -13,7 +13,7 @@ namespace Web.Client.Shared
             _localStorage = localStorage;
         }
 
-        public async Task<string> GetAuthTokenAsync()
+        public async Task<string>? GetAuthTokenAsync()
         {
             string token = await _localStorage.GetItemAsStringAsync("authToken");
             if (string.IsNullOrEmpty(token))
@@ -21,6 +21,36 @@ namespace Web.Client.Shared
                 return null; 
             }
             return token;
+        }
+
+        public async Task<string>? GetUserIdAsync()
+        {
+            string id = await _localStorage.GetItemAsStringAsync("userId");
+            if (string.IsNullOrEmpty(id))
+            {
+                return null;
+            }
+            return id;
+        }
+
+        public async Task SetUserId(string userId)
+        {
+            await _localStorage.SetItemAsync("userId", userId);         
+        }
+
+        public async Task SetToken(string token)
+        {
+            await _localStorage.SetItemAsync("authToken", token);
+        }
+
+        public async Task RemoveToken()
+        {
+            await _localStorage.RemoveItemAsync("authToken");
+        }
+
+        public async Task RemoveUserId()
+        {
+            await _localStorage.RemoveItemAsync("userId");
         }
     }
 }

@@ -10,7 +10,8 @@ namespace ReserveSpot.Domain
 
         [Required(ErrorMessage = "ImageUrl is required")]
         [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
+        public bool? IsArchived { get; set; }
 
         [RegularExpression(@"^(\+?3?8)?(0\d{9})$", ErrorMessage = "Invalid Ukrainian phone number")]
         public string? ContactPhone { get; set; }

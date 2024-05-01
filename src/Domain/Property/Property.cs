@@ -41,6 +41,7 @@ namespace ReserveSpot.Domain
 
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
+        public bool IsArchived { get; set; } = false;
 
         [Required(ErrorMessage = "UserID is required")]
         public Guid UserID { get; set; }
@@ -78,6 +79,7 @@ namespace ReserveSpot.Domain
             PricePerHour = updateDetail.PricePerHour ?? PricePerHour;
             Capacity = updateDetail.Capacity ?? Capacity;
             ImageUrl = updateDetail.ImageUrl ?? ImageUrl;
+            IsArchived = updateDetail.IsArchived ?? IsArchived;
 
             StartDate = updateDetail.StartDate ?? StartDate;
             EndDate = updateDetail.EndDate ?? EndDate;          

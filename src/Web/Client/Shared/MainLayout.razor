@@ -1,7 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@using Blazored.LocalStorage;
-@inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
+@inject TokenManager TokenManager
 
 <style>
     .top-row {
@@ -64,19 +63,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        string token = await LocalStorage.GetItemAsStringAsync("authToken");
-        if (!string.IsNullOrEmpty(token))
+        string token = await TokenManager.GetAuthTokenAsync();
+        if (token != null)
         {
             isLoggedIn = true;
-        } else
-        {
-            NavigationManager.NavigateTo("/login", forceLoad: true);
-        }
+        } 
     }
 
     private async Task Logout()
     {
-        await LocalStorage.RemoveItemAsync("authToken");
+        isLoggedIn = false;
+        await TokenManager.RemoveToken();
+        await TokenManager.RemoveUserId();
         NavigationManager.NavigateTo("/", forceLoad: true);
     }
 }

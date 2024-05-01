@@ -1,11 +1,12 @@
 ﻿@page "/properties"
+
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
 @using Web.Shared.Dto;
-@using Blazored.LocalStorage;
 @using Web.Shared;
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject TokenManager TokenManager
 
 <style>
 .search-bar {
@@ -89,8 +90,7 @@
     <input type="number" @bind="minCapacity" placeholder="Min Capacity" class="search-input" />
     <input type="text" @bind="locationFilter" placeholder="Location" class="search-input"/>
     <input type="number" @bind="minPricePerHour" placeholder="Min Price per Hour" class="search-input"/>
-    @* <input type="number" @bind="maxPricePerHour" placeholder="Max Price per Hour" class="search-input"/> *@
-
+   
     <button @onclick="ApplyFilters" class="search-button">Search</button>
 </div>
 
@@ -168,10 +168,8 @@
         var errors = ModelValidator.ValidateModel(dto);
         if (errors.Count > 0)
         {
-            Console.WriteLine("Validation errors:");
             foreach (var error in errors)
             {
-                Console.WriteLine(error.ErrorMessage);
                 validationErrors.Add(error.ErrorMessage);
             }
             notificationComponent.Show(validationErrors);

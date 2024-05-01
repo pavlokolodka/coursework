@@ -1,4 +1,5 @@
-﻿@page "/add-property"
+﻿@page "/update-property/{PropertyId}"
+                         
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
@@ -6,6 +7,7 @@
 @using Web.Shared.Dto;
 @inject TokenManager TokenManager
 @inject NavigationManager NavigationManager
+@using Web.Shared.Dto.Property;
 @inject HttpClient Http
 
 <style>
@@ -36,7 +38,7 @@
 </style>
 
 
-<h3>Add New Property</h3>
+<h3>Update Property</h3>
 
 <EditForm EditContext="@editContext" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator />
@@ -44,17 +46,17 @@
 
     <div class="form-group">
         <label for="name">Name:</label>
-        <InputText id="name" @bind-Value="addPropertyModel.Name" class="form-control" />
+        <InputText id="name" @bind-Value="updatePropertyModel.Name" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="description">Description:</label>
-        <InputTextArea id="description" @bind-Value="addPropertyModel.Description" class="form-control" />
+        <InputTextArea id="description" @bind-Value="updatePropertyModel.Description" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="type">Type:</label>
-        <InputSelect id="type" @bind-Value="addPropertyModel.Type" class="form-control">
+        <InputSelect id="type" @bind-Value="updatePropertyModel.Type" class="form-control">
             <option value="">Select a type</option>
             @foreach (var type in Enum.GetValues(typeof(PropertyType)))
             {
@@ -65,58 +67,86 @@
 
     <div class="form-group">
         <label for="location">Location:</label>
-        <InputText id="location" @bind-Value="addPropertyModel.Location" class="form-control" />
+        <InputText id="location" @bind-Value="updatePropertyModel.Location" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="contactPhone">Contact Phone:</label>
-        <InputText id="contactPhone" @bind-Value="addPropertyModel.ContactPhone" class="form-control" />
+        <InputText id="contactPhone" @bind-Value="updatePropertyModel.ContactPhone" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="contactName">Contact Name:</label>
-        <InputText id="contactName" @bind-Value="addPropertyModel.ContactName" class="form-control" />
+        <InputText id="contactName" @bind-Value="updatePropertyModel.ContactName" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="pricePerHour">Price Per Hour:</label>
-        <InputNumber id="pricePerHour" @bind-Value="addPropertyModel.PricePerHour" class="form-control" />
+        <InputNumber id="pricePerHour" @bind-Value="updatePropertyModel.PricePerHour" class="form-control" />
     </div>
 
 
     <div class="form-group">
         <label for="property-image">Image URL:</label>
-        <InputText id="property-image" @bind-Value="addPropertyModel.ImageUrl" class="form-control" />
+        <InputText id="property-image" @bind-Value="updatePropertyModel.ImageUrl" class="form-control" />
     </div>
 
 
     <div class="form-group">
         <label for="capacity">Capacity:</label>
-        <InputNumber id="capacity" @bind-Value="addPropertyModel.Capacity" class="form-control" />
+        <InputNumber id="capacity" @bind-Value="updatePropertyModel.Capacity" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="startDate">Start Date:</label>
-        <InputDate id="startDate" @bind-Value="addPropertyModel.StartDate" class="form-control" />
+        <InputDate id="startDate" @bind-Value="updatePropertyModel.StartDate" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="endDate">EndDate:</label>
-        <InputDate id="endDate" @bind-Value="addPropertyModel.EndDate" class="form-control" />
+        <InputDate id="endDate" @bind-Value="updatePropertyModel.EndDate" class="form-control" />
+    </div>
+
+     <div class="form-group">
+        <label for="archived">Archived:</label>
+        <InputCheckbox id="archived" @bind-Value="updatePropertyModel.IsArchived"  />
     </div>
 
     <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Add Property</button>
 </EditForm>
 
 @code {
-    private AddPropertyModel addPropertyModel = new AddPropertyModel();
+    [Parameter]
+    public string PropertyId { get; set; }
+
+    private UpdatePropertyModel updatePropertyModel = new UpdatePropertyModel();
     private EditContext editContext;
     private bool isFormInvalid = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        editContext = new EditContext(addPropertyModel);
+        editContext = new EditContext(updatePropertyModel);
         editContext.OnFieldChanged += HandleFieldChanged;
+
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        var property = await Http.GetFromJsonAsync<PropertyModel>($"api/properties/{PropertyId}", options);
+
+        updatePropertyModel.Name = property.Name;
+        updatePropertyModel.Description = property.Description;
+        updatePropertyModel.Type = property.Type;
+        updatePropertyModel.Location = property.Location;
+        updatePropertyModel.ContactPhone = property.ContactPhone;
+        updatePropertyModel.ContactName = property.ContactName;
+        updatePropertyModel.PricePerHour = property.PricePerHour;
+        updatePropertyModel.ImageUrl = property.ImageUrl;
+        updatePropertyModel.Capacity = property.Capacity;
+        updatePropertyModel.StartDate = property.StartDate;
+        updatePropertyModel.EndDate = property.EndDate;
+        updatePropertyModel.IsArchived = property.IsArchived;
     }
 
     private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
@@ -147,8 +177,8 @@
             };
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "api/properties");
-            var json = JsonSerializer.Serialize(addPropertyModel, options);
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"api/properties/{PropertyId}");
+            var json = JsonSerializer.Serialize(updatePropertyModel, options);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json"); 
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
             var response = await Http.SendAsync(request);

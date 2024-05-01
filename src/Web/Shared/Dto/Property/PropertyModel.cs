@@ -30,6 +30,7 @@ namespace Web.Shared.Dto
         [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
         public string ImageUrl { get; set; }
 
+        public bool IsArchived { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
 		public decimal PricePerHour { get; set; }

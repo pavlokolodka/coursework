@@ -54,7 +54,8 @@ namespace ReserveSpot.Domain
             (payload.PricePerHour == null || property.PricePerHour <= payload.PricePerHour) && 
             (payload.Capacity == null || property.Capacity >= payload.Capacity) &&  
             (payload.StartDate == null || property.StartDate >= payload.StartDate) &&  
-            (payload.EndDate == null || property.EndDate <= payload.EndDate); 
+            (payload.EndDate == null || property.EndDate <= payload.EndDate) &&
+            property.IsArchived == false; 
 
             return propertyDao.FindMany(filter);
         }
