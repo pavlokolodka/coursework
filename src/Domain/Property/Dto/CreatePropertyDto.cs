@@ -10,6 +10,10 @@ namespace ReserveSpot.Domain
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "ImageUrl is required")]
+        [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
+        public string ImageUrl { get; set; }
+
         [Required(ErrorMessage = "Type is required")]
         public PropertyType? Type { get; set; } = null;
 

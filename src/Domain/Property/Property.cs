@@ -12,6 +12,10 @@ namespace ReserveSpot.Domain
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "ImageUrl is required")]
+        [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
+        public string ImageUrl { get; set; }
+
         [Required(ErrorMessage = "Type is required")]
         [JsonConverter(typeof(StringEnumConverter))]
         public PropertyType Type { get; set; }
@@ -47,7 +51,7 @@ namespace ReserveSpot.Domain
             return pricePerHour * 24 * numberOfDays; 
         }
 
-        public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, Guid creatorID)
+        public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, string imageUrl, Guid creatorID)
         {
             Name = name;
             Description = description;
@@ -59,6 +63,7 @@ namespace ReserveSpot.Domain
             Capacity = capacity;
             StartDate = startDate;
             EndDate = endDate;
+            ImageUrl = imageUrl;
             UserID = creatorID;      
         }             
 
@@ -72,6 +77,7 @@ namespace ReserveSpot.Domain
             ContactName = updateDetail.ContactName ?? ContactName;
             PricePerHour = updateDetail.PricePerHour ?? PricePerHour;
             Capacity = updateDetail.Capacity ?? Capacity;
+            ImageUrl = updateDetail.ImageUrl ?? ImageUrl;
 
             StartDate = updateDetail.StartDate ?? StartDate;
             EndDate = updateDetail.EndDate ?? EndDate;          

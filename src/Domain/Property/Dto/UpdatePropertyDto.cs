@@ -7,6 +7,11 @@ namespace ReserveSpot.Domain
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? ContactName { get; set; }
+
+        [Required(ErrorMessage = "ImageUrl is required")]
+        [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
+        public string ImageUrl { get; set; }
+
         [RegularExpression(@"^(\+?3?8)?(0\d{9})$", ErrorMessage = "Invalid Ukrainian phone number")]
         public string? ContactPhone { get; set; }
         public PropertyType? Type { get; set; }

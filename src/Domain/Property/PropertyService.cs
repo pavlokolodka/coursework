@@ -13,7 +13,7 @@ namespace ReserveSpot.Domain
 
         public Property Create(Guid userId, CreatePropertyDto payload)
         {
-            Property newProperty = new Property(payload.Name, payload.Description, (PropertyType)payload.Type, payload.Location, payload.ContactPhone, payload.ContactName, payload.PricePerHour, payload.Capacity, (DateTime)payload.StartDate, (DateTime)payload.EndDate, userId);
+            Property newProperty = new Property(payload.Name, payload.Description, (PropertyType)payload.Type, payload.Location, payload.ContactPhone, payload.ContactName, payload.PricePerHour, payload.Capacity, (DateTime)payload.StartDate, (DateTime)payload.EndDate, payload.ImageUrl, userId); ;
             return propertyDao.Create(newProperty);
         }
 
