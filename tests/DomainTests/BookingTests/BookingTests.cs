@@ -14,15 +14,17 @@ namespace DomainTests
             DateTime endDate = new DateTime(2024, 4, 14);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
+            decimal price = 150.40M;
 
-            Booking booking = new Booking(startDate, endDate, userId, propertyId);
+            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
 
             Assert.AreEqual(startDate, booking.StartDate);
             Assert.AreEqual(endDate, booking.EndDate);
+            Assert.AreEqual(price, booking.TotalPrice);
             Assert.AreEqual(userId, booking.UserID);
             Assert.AreEqual(propertyId, booking.PropertyID);
             Assert.AreEqual(BookingStatus.Registered, booking.Status);
-        }
+        }    
 
         [TestMethod]
         public void ValidateObject_ValidBooking()
@@ -31,8 +33,9 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(10);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
+            decimal price = 150.40M;
 
-            Booking booking = new Booking(startDate, endDate, userId, propertyId);
+            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
 
             var context = new ValidationContext(booking);
             var results = new List<ValidationResult>();
@@ -49,8 +52,9 @@ namespace DomainTests
             DateTime endDate = new DateTime(2024, 4, 7);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
+            decimal price = 0M;
 
-            Booking booking = new Booking(startDate, endDate, userId, propertyId);
+            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
 
             var context = new ValidationContext(booking);
             var results = new List<ValidationResult>();
@@ -61,7 +65,8 @@ namespace DomainTests
             var expectedErrors = new Dictionary<string, string>
             {
                 { nameof(Booking.StartDate), "StartDate must be less than or equal to EndDate" },
-                { nameof(Booking.EndDate), "EndDate must be greater than or equal to StartDate" }
+                { nameof(Booking.EndDate), "EndDate must be greater than or equal to StartDate" },
+                { nameof(Booking.TotalPrice), "TotalPrice must be greater than 0" }
             };
 
             foreach (var result in results)
@@ -80,11 +85,15 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(10);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
-            Booking booking = new Booking(startDate, endDate, userId, propertyId);
+            decimal price = 150.40M;
+
+            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+
             DateTime newStartDate = startDate.AddDays(10);
             DateTime newEndDate = endDate.AddDays(10);
+            decimal newPrice = 1123.40M;
 
-            booking.Edit(newStartDate, newEndDate);
+            booking.Edit(newPrice, newStartDate, newEndDate);
             var context = new ValidationContext(booking);
             var results = new List<ValidationResult>();
             var isValid = Validator.TryValidateObject(booking, context, results, true);
@@ -100,12 +109,15 @@ namespace DomainTests
             DateTime endDate = new DateTime(2024, 4, 14);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
-            Booking booking = new Booking(startDate, endDate, userId, propertyId);
+            decimal price = 150.40M;
+
+            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
 
             DateTime newStartDate = new DateTime(2024, 4, 17);
             DateTime newEndDate = new DateTime(2024, 4, 10);
+            decimal newPrice = 1;
 
-            booking.Edit(newStartDate, newEndDate);
+            booking.Edit(newPrice, newStartDate, newEndDate);
 
             var context = new ValidationContext(booking);
             var results = new List<ValidationResult>();
@@ -121,14 +133,17 @@ namespace DomainTests
             DateTime endDate = DateTime.Now.AddDays(-3);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
-            Booking booking = new Booking(startDate, endDate, userId, propertyId);
+            decimal price = 150.40M;
+
+            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+
             booking.CheckBookingStatus();
 
             Assert.ThrowsException<InvalidOperationException>(() =>
             {
                 try
                 {
-                    booking.Edit(DateTime.Now.AddDays(1), DateTime.Now.AddDays(3));
+                    booking.Edit(null, DateTime.Now.AddDays(1), DateTime.Now.AddDays(3));
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -145,12 +160,14 @@ namespace DomainTests
             DateTime endDate = DateTime.Now.AddDays(-3);
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
-            Booking booking = new Booking(startDate, endDate, userId, propertyId);
+            decimal price = 150.40M;
+            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
 
-            booking.Edit(DateTime.Now.AddDays(1), DateTime.Now.AddDays(3));
+            booking.Edit(150, DateTime.Now.AddDays(1), DateTime.Now.AddDays(3));
 
             Assert.AreEqual(DateTime.Now.AddDays(1).Date, booking.StartDate.Date);
             Assert.AreEqual(DateTime.Now.AddDays(3).Date, booking.EndDate.Date);
+            Assert.AreEqual(150, booking.TotalPrice);
         }
     }
 }

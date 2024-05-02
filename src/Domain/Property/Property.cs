@@ -84,6 +84,13 @@ namespace ReserveSpot.Domain
             StartDate = updateDetail.StartDate ?? StartDate;
             EndDate = updateDetail.EndDate ?? EndDate;          
         }
+
+        public int CountTotalDays()
+        {
+            var timeSpan = EndDate - StartDate;
+            
+            return (int)timeSpan.TotalDays + 1;
+        }
     }
 
     public class PropertyDetails

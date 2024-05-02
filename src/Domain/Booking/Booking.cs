@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 
 namespace ReserveSpot.Domain
 {
@@ -11,6 +13,7 @@ namespace ReserveSpot.Domain
         public Guid UserID { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public BookingStatus Status { get; set; }
 
         [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
@@ -19,7 +22,12 @@ namespace ReserveSpot.Domain
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
 
-        public Booking(DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+        [Range(1, int.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
+        public decimal TotalPrice { get; set; }
+
+
+        public Booking(decimal price, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+            TotalPrice = price;
             StartDate = startDate;
             EndDate = endDate;
             UserID = userId;
@@ -35,13 +43,14 @@ namespace ReserveSpot.Domain
             }       
         }
 
-        public void Edit(DateTime? startDate, DateTime? endDate)
+        public void Edit(decimal? price, DateTime? startDate, DateTime? endDate)
         {
             if (Status == BookingStatus.Finished)
             {
                 throw new InvalidOperationException("Cannot edit a finished booking");
             }
 
+            TotalPrice = price ?? TotalPrice;
             StartDate = startDate ?? StartDate; 
             EndDate = endDate ?? EndDate; 
         }        

@@ -42,6 +42,31 @@ namespace DomainTests
         }
 
         [TestMethod]
+        public void CountTotalDays()
+        {
+            DateTime startDate = new DateTime(2024, 4, 7);
+            DateTime endDate = new DateTime(2024, 4, 14);
+            int expectedTotalDays = 8; // 14 - 7, including 7;
+            decimal price = 150.40M;
+            string name = faker.Commerce.ProductName();
+            string description = faker.Lorem.Sentence();
+            PropertyType type = faker.PickRandom<PropertyType>();
+            string location = faker.Address.FullAddress();
+            string contactPhone = faker.Phone.PhoneNumber("+380#########");
+            string contactName = faker.Name.FirstName();
+            decimal pricePerHour = faker.Finance.Amount(10, 1000);
+            int capacity = faker.Random.Int(1, 20);
+            Guid creatorID = Guid.NewGuid();
+
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
+            int totalDays = property.CountTotalDays();
+            
+                       
+            Assert.AreEqual(expectedTotalDays, totalDays);           
+        }
+
+        [TestMethod]
         public void Edit_UpdatesProperties()
         {
             string name = faker.Commerce.ProductName();

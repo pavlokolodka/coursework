@@ -1,10 +1,11 @@
-﻿namespace ReserveSpot.Domain
+﻿using System.Data;
+
+namespace ReserveSpot.Domain
 {
     public class BookingService
     {
         private readonly IDao<Booking> bookingDao;
 
-        // Ensure the constructor is also public
         public BookingService(IDao<Booking> dao)
         {
             bookingDao = dao;
@@ -12,7 +13,9 @@
 
         public Booking Create(CreateBookingDto payload)
         {
-            throw new NotImplementedException();
+            Booking newBooking = new(payload.TotalPrice, payload.StartDate, payload.EndDate, payload.UserID, payload.PropertyID);
+
+            return bookingDao.Create(newBooking);
         }
 
         public Booking Update(UpdateBookingDto payload)
@@ -21,19 +24,38 @@
 
         }
 
-        public Booking Find(FindOneBookingDto payload)
+        public Booking? Find(FindOneBookingDto payload)
         {
-            throw new NotImplementedException();
+            return bookingDao.FindOne(booking => booking.UserID.Equals(payload.UserID) && booking.ID.Equals(payload.BookingID));
         }
 
         public List<Booking> FindAll(string userId)
         {
-            throw new NotImplementedException();
+            return bookingDao.FindMany(booking => booking.UserID.Equals(userId));   
         }
 
         public bool Delete(DeleteBookingDto payload)
         {
-            throw new NotImplementedException();
+            var booking = bookingDao.FindOne(booking => booking.ID.Equals(payload.BookingID));
+
+            if (booking == null) {
+                throw new InvalidOperationException("Booking not found");
+            };
+
+            if (booking.UserID.ToString() != payload.UserID && !payload.IsAdmin)
+            {
+                throw new AccessViolationException("Cannot edit another user property");
+            }
+
+            if (booking.Status == BookingStatus.Finished)
+            {
+                throw new DataException("Cannot delete finished booking");
+            }
+
+
+            bookingDao.Delete(booking => booking.ID.Equals(payload.BookingID));
+
+            return true;
         }
     }
 }
