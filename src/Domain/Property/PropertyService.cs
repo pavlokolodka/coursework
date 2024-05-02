@@ -13,7 +13,7 @@ namespace ReserveSpot.Domain
 
         public Property Create(Guid userId, CreatePropertyDto payload)
         {
-            Property newProperty = new Property(payload.Name, payload.Description, (PropertyType)payload.Type, payload.Location, payload.ContactPhone, payload.ContactName, payload.PricePerHour, payload.Capacity, (DateTime)payload.StartDate, (DateTime)payload.EndDate, userId);
+            Property newProperty = new Property(payload.Name, payload.Description, (PropertyType)payload.Type, payload.Location, payload.ContactPhone, payload.ContactName, payload.PricePerHour, payload.Capacity, (DateTime)payload.StartDate, (DateTime)payload.EndDate, payload.ImageUrl, userId); ;
             return propertyDao.Create(newProperty);
         }
 
@@ -54,7 +54,8 @@ namespace ReserveSpot.Domain
             (payload.PricePerHour == null || property.PricePerHour <= payload.PricePerHour) && 
             (payload.Capacity == null || property.Capacity >= payload.Capacity) &&  
             (payload.StartDate == null || property.StartDate >= payload.StartDate) &&  
-            (payload.EndDate == null || property.EndDate <= payload.EndDate); 
+            (payload.EndDate == null || property.EndDate <= payload.EndDate) &&
+            property.IsArchived == false; 
 
             return propertyDao.FindMany(filter);
         }

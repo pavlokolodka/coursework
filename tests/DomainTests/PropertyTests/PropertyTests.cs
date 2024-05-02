@@ -25,7 +25,8 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
 
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
 
             Assert.AreEqual(name, property.Name);
             Assert.AreEqual(description, property.Description);
@@ -55,7 +56,8 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
 
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
 
             UpdatePropertyDto updateDetails = new UpdatePropertyDto
             {
@@ -114,7 +116,8 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
 
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
 
             property.Edit(updateDetail);
 
@@ -139,9 +142,8 @@ namespace DomainTests
             DateTime startDate = DateTime.Now.AddSeconds(1);
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
-            Debug.WriteLine($"start {startDate}");
-            Debug.WriteLine($"end {endDate}");
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
 
 
             property.Edit(new UpdatePropertyDto());
@@ -171,7 +173,8 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
 
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
 
 
             UpdatePropertyDto updateDetail = new UpdatePropertyDto

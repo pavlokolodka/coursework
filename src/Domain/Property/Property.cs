@@ -12,6 +12,10 @@ namespace ReserveSpot.Domain
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "ImageUrl is required")]
+        [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
+        public string ImageUrl { get; set; }
+
         [Required(ErrorMessage = "Type is required")]
         [JsonConverter(typeof(StringEnumConverter))]
         public PropertyType Type { get; set; }
@@ -37,20 +41,18 @@ namespace ReserveSpot.Domain
 
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
+        public bool IsArchived { get; set; } = false;
 
         [Required(ErrorMessage = "UserID is required")]
         public Guid UserID { get; set; }
-
-        public List<Review>? PropertyReviews { get; set; }
-        public List<Booking>? PropertyBooking { get; set; }
-
+               
         public static int PropetryCount;
         public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
         {
             return pricePerHour * 24 * numberOfDays; 
         }
 
-        public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, Guid creatorID)
+        public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, string imageUrl, Guid creatorID)
         {
             Name = name;
             Description = description;
@@ -62,6 +64,7 @@ namespace ReserveSpot.Domain
             Capacity = capacity;
             StartDate = startDate;
             EndDate = endDate;
+            ImageUrl = imageUrl;
             UserID = creatorID;      
         }             
 
@@ -75,6 +78,8 @@ namespace ReserveSpot.Domain
             ContactName = updateDetail.ContactName ?? ContactName;
             PricePerHour = updateDetail.PricePerHour ?? PricePerHour;
             Capacity = updateDetail.Capacity ?? Capacity;
+            ImageUrl = updateDetail.ImageUrl ?? ImageUrl;
+            IsArchived = updateDetail.IsArchived ?? IsArchived;
 
             StartDate = updateDetail.StartDate ?? StartDate;
             EndDate = updateDetail.EndDate ?? EndDate;          

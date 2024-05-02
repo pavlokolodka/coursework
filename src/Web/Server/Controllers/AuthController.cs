@@ -27,7 +27,6 @@ namespace Web.Server.Controllers
                 createdUser = _userService.Create(payload);
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 if (ex is InvalidOperationException)
                 {
                     return Conflict("User with this email already exists");

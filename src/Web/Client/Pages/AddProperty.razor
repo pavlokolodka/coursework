@@ -1,0 +1,174 @@
+﻿@page "/add-property"
+@using System.ComponentModel.DataAnnotations
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using System.Text;
+@using Web.Shared.Dto;
+@inject TokenManager TokenManager
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<style>
+.validation-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 2px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+.btn-primary {
+    padding: 10px 15px;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    cursor: pointer;
+}
+</style>
+
+
+<h3>Add New Property</h3>
+
+<EditForm EditContext="@editContext" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <InputText id="name" @bind-Value="addPropertyModel.Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="description">Description:</label>
+        <InputTextArea id="description" @bind-Value="addPropertyModel.Description" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="type">Type:</label>
+        <InputSelect id="type" @bind-Value="addPropertyModel.Type" class="form-control">
+            <option value="">Select a type</option>
+            @foreach (var type in Enum.GetValues(typeof(PropertyType)))
+            {
+                    <option value="@type">@type</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="location">Location:</label>
+        <InputText id="location" @bind-Value="addPropertyModel.Location" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="contactPhone">Contact Phone:</label>
+        <InputText id="contactPhone" @bind-Value="addPropertyModel.ContactPhone" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="contactName">Contact Name:</label>
+        <InputText id="contactName" @bind-Value="addPropertyModel.ContactName" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="pricePerHour">Price Per Hour:</label>
+        <InputNumber id="pricePerHour" @bind-Value="addPropertyModel.PricePerHour" class="form-control" />
+    </div>
+
+
+    <div class="form-group">
+        <label for="property-image">Image URL:</label>
+        <InputText id="property-image" @bind-Value="addPropertyModel.ImageUrl" class="form-control" />
+    </div>
+
+
+    <div class="form-group">
+        <label for="capacity">Capacity:</label>
+        <InputNumber id="capacity" @bind-Value="addPropertyModel.Capacity" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="startDate">Start Date:</label>
+        <InputDate id="startDate" @bind-Value="addPropertyModel.StartDate" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="endDate">EndDate:</label>
+        <InputDate id="endDate" @bind-Value="addPropertyModel.EndDate" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Add Property</button>
+</EditForm>
+
+@code {
+    private AddPropertyModel addPropertyModel = new AddPropertyModel();
+    private EditContext editContext;
+    private bool isFormInvalid = true;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(addPropertyModel);
+        editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        UpdateIsFormInvalid();
+    }
+
+    private void UpdateIsFormInvalid()
+    {
+        isFormInvalid = !editContext.Validate();
+        StateHasChanged(); 
+    }
+
+    private async Task HandleSubmit()
+    {
+        var token = await TokenManager.GetAuthTokenAsync();
+
+        if (token == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/properties");
+            var json = JsonSerializer.Serialize(addPropertyModel, options);
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json"); 
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/rental", forceLoad: true);
+                return;                
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        
+    }
+
+    public void Dispose()
+    {
+        editContext.OnFieldChanged -= HandleFieldChanged; 
+    }
+}

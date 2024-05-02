@@ -23,7 +23,8 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
             var dao = new PropertyJSONDao();
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
             var createdProperty = dao.Create(property);
 
             Assert.AreEqual(name, createdProperty.Name);
@@ -58,7 +59,8 @@ namespace DomainTests
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
             var dao = new PropertyJSONDao();
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, creatorID);
+            string imageUrl = "https://domain/photo.jpeg";
+            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
 
             try
             {

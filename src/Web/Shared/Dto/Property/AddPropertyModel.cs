@@ -1,21 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ReserveSpot.Domain
+namespace Web.Shared.Dto
 {
-     public class CreatePropertyDto
-     {
+    public class AddPropertyModel
+    {
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "Type is required")]
+        public PropertyType? Type { get; set; } = null;
+
         [Required(ErrorMessage = "ImageUrl is required")]
         [RegularExpression(@"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|jpeg|gif|png)", ErrorMessage = "Please enter a valid image URL.")]
         public string ImageUrl { get; set; }
-
-        [Required(ErrorMessage = "Type is required")]
-        public PropertyType? Type { get; set; } = null;
 
         [Required(ErrorMessage = "Location is required")]
         public string Location { get; set; }
@@ -34,7 +34,6 @@ namespace ReserveSpot.Domain
         public int Capacity { get; set; }
 
         [Required(ErrorMessage = "StartDate is required")]
-        //[Required(ErrorMessage = "StartDate is required")]
         [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than EndDate, and to be greater or equal to current date")]
         public DateTime? StartDate { get; set; } = null;
 

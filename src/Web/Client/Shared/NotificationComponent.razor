@@ -1,0 +1,49 @@
+﻿<style>
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px;
+    background-color: rgba(255, 100, 100, 0.9);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    width: auto;
+    max-width: 300px;
+}
+
+.notification div {
+    margin-top: 5px;
+    text-align: left;
+}
+
+</style>
+
+@if (showNotification)
+{
+        <div class="notification">
+        @foreach (var error in messages)
+        {
+                    <div>@error</div>
+        }
+        </div>
+}
+
+@code {
+    public List<string> messages = new List<string>();
+    private bool showNotification = false;
+
+    public void Show(List<string> errorMessages)
+    {
+        messages = errorMessages;
+        showNotification = true;
+        InvokeAsync(StateHasChanged);
+        Task.Delay(5000).ContinueWith(t =>
+        {
+            showNotification = false;
+            errorMessages.RemoveAll(s => true);
+            InvokeAsync(StateHasChanged); 
+        });
+    }
+}

@@ -1,0 +1,214 @@
+﻿@page "/properties"
+
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using Web.Shared.Dto;
+@using Web.Shared;
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject TokenManager TokenManager
+
+<style>
+.search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px; 
+}
+
+.search-button {
+    padding: 8px 16px;
+    background-color: #007bff; 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+    background-color: #0056b3; 
+}
+
+.property-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+.property-item {
+    display: flex;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.image-block img {
+    width: 200px;
+    height: 200px;
+    margin-right: 20px;
+}
+
+.property-details {
+    flex-grow: 1;
+}
+
+.property-details h4 {
+    margin-top: 0;
+}
+
+</style>
+
+
+
+ <NotificationComponent @ref="notificationComponent" />
+
+ <div class="search-bar">
+
+    <input type="text" @bind="searchTerm" placeholder="Search properties..." class="search-input"/>
+
+    <input type="date" @bind="startDateFilter" class="search-input"/>
+    <input type="date" @bind="endDateFilter" class="search-input"/>
+
+    <select @bind="typeFilter" class="search-input">
+        <option value="">All Types</option>
+        @foreach (var type in Enum.GetValues(typeof(PropertyType)))
+        {
+                <option value="@type">@type</option>
+        }
+    </select>
+
+    <input type="number" @bind="minCapacity" placeholder="Min Capacity" class="search-input" />
+    <input type="text" @bind="locationFilter" placeholder="Location" class="search-input"/>
+    <input type="number" @bind="minPricePerHour" placeholder="Min Price per Hour" class="search-input"/>
+   
+    <button @onclick="ApplyFilters" class="search-button">Search</button>
+</div>
+
+<div class="property-list">
+    @foreach (var property in filteredProperties)
+    {
+                <div class="property-item" @onclick="() => NavigateToDetails(property.ID.ToString())" style="cursor: pointer;">
+                <div class="image-block">
+                        @* <img src="https://images.pexels.com/photos/186077/pexels-photo-186077.jpeg?cs=srgb&dl=pexels-binyaminmellish-186077.jpg&fm=jpg" alt="Property Image"/> *@
+                        <img src="@property.ImageUrl" alt="Property Image"/>
+                </div>
+                <div class="property-details">
+                    <h4>@property.Name</h4>
+                    <p>@property.Description</p>
+                    <p><strong>Type:</strong> @property.Type</p>
+                    <p><strong>Location:</strong> @property.Location</p>
+                    <p><strong>Contact:</strong> @property.ContactName (@property.ContactPhone)</p>
+                    <p><strong>Price Per Hour:</strong> $@property.PricePerHour</p>
+                    <p><strong>Capacity:</strong> @property.Capacity</p>
+                    <p><strong>Available Dates:</strong> @property.StartDate.ToShortDateString() - @property.EndDate.ToShortDateString()</p>
+                </div>
+            </div>
+    }
+</div>
+
+
+@code {
+    private PropertyModel propertyFilter = new PropertyModel();
+    private string searchTerm = "";
+    private DateTime? startDateFilter;
+    private DateTime? endDateFilter;
+    private string typeFilter = "";
+    private int? minCapacity;
+    private string locationFilter = "";
+    private decimal? minPricePerHour;
+    private decimal? maxPricePerHour;
+    private List<PropertyModel> properties = new List<PropertyModel>();
+    private List<PropertyModel> filteredProperties = new List<PropertyModel>();
+    private List<string> validationErrors = new List<string>();
+
+    private NotificationComponent notificationComponent;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        try
+        {
+            filteredProperties = await Http.GetFromJsonAsync<List<PropertyModel>>("api/properties", options);
+        } catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+    }
+
+    private async Task ApplyFilters()
+    {
+        PropertyType typeEnum;
+        bool isTypeValid = Enum.TryParse<PropertyType>(typeFilter, true, out typeEnum);
+        var dto = new PropertyFilter()
+            {
+                Name = searchTerm,
+                StartDate = startDateFilter,
+                EndDate = endDateFilter,
+                Type = isTypeValid ? typeEnum : null,
+                Capacity = minCapacity,
+                Location = locationFilter,
+                PricePerHour = minPricePerHour
+            };
+        var errors = ModelValidator.ValidateModel(dto);
+        if (errors.Count > 0)
+        {
+            foreach (var error in errors)
+            {
+                validationErrors.Add(error.ErrorMessage);
+            }
+            notificationComponent.Show(validationErrors);
+
+            return;
+        }
+        var query = new List<string>();
+
+        if (!string.IsNullOrEmpty(dto.Name))
+            query.Add($"name={Uri.EscapeDataString(dto.Name)}");
+        if (dto.Type.HasValue)
+            query.Add($"type={dto.Type.Value}");
+        if (!string.IsNullOrEmpty(dto.Location))
+            query.Add($"location={Uri.EscapeDataString(dto.Location)}");
+        if (dto.PricePerHour.HasValue)
+            query.Add($"pricePerHour={dto.PricePerHour.Value}");
+        if (dto.Capacity.HasValue)
+            query.Add($"capacity={dto.Capacity.Value}");
+        if (dto.StartDate.HasValue)
+            query.Add($"startDate={dto.StartDate.Value:yyyy-MM-dd}");
+        if (dto.EndDate.HasValue)
+            query.Add($"endDate={dto.EndDate.Value:yyyy-MM-dd}");
+
+        string queryString = query.Count > 0 ? $"?{string.Join("&", query)}" : string.Empty;
+
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        try
+        {
+            filteredProperties = await Http.GetFromJsonAsync<List<PropertyModel>>($"api/properties{queryString}", options);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private void NavigateToDetails(string propertyId) => NavigationManager.NavigateTo($"/property-details/{propertyId}");
+}

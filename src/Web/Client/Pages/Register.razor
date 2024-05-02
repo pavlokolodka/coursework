@@ -1,10 +1,9 @@
 ﻿@page "/register"
 @using System.ComponentModel.DataAnnotations;
-@using Blazored.LocalStorage;
 @using Web.Shared.Dto;
 @inject HttpClient Http
-@inject ILocalStorageService LocalStorage
 @inject NavigationManager NavigationManager
+@inject TokenManager TokenManager
 
 
 <style>
@@ -120,8 +119,7 @@ button {
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResult>();
-                Console.WriteLine($"Result: {result.AccessToken}");
-                await LocalStorage.SetItemAsync("authToken", result.AccessToken);
+                await TokenManager.SetToken(result.AccessToken);
                 NavigationManager.NavigateTo("/properties");
             }
             else
