@@ -63,9 +63,8 @@ namespace DomainTests
             dao.Create(newBooking);
 
             DateTime newEndDate = endDate.AddHours(1);
-            newBooking.Edit(null, null, newEndDate);
+            newBooking.Edit(null, newEndDate);
             var updatedBooking = dao.Update(booking => booking.ID == newBooking.ID, newBooking);
-
 
             Assert.AreEqual(startDate, updatedBooking.StartDate);
             Assert.AreEqual(newEndDate, updatedBooking.EndDate);

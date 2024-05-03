@@ -22,19 +22,26 @@ namespace ReserveSpot.Domain
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
+        [Range(1, double.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
         public decimal TotalPrice { get; set; }
 
+        [Range(1, double.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
+        public decimal PricePerHour { get; set; }
 
-        public Booking(decimal price, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
-            TotalPrice = price;
+        public Booking(decimal pricePerHour, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+            PricePerHour = pricePerHour;
             StartDate = startDate;
             EndDate = endDate;
             UserID = userId;
             PropertyID = propertyId;
             Status = BookingStatus.Registered;
+            int totalDays = CountTotalDays();
+            TotalPrice = CountTotalPrice(pricePerHour, totalDays);
         }
-        
+        public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
+        {
+            return pricePerHour * 24 * numberOfDays;
+        }
         public void CheckBookingStatus()
         {
             if (DateTime.Now > EndDate)
@@ -42,17 +49,26 @@ namespace ReserveSpot.Domain
                 Status = BookingStatus.Finished;
             }       
         }
+        public int CountTotalDays()
+        {
+            var timeSpan = EndDate - StartDate;
 
-        public void Edit(decimal? price, DateTime? startDate, DateTime? endDate)
+            return (int)timeSpan.TotalDays + 1;
+        }
+
+
+        public void Edit(DateTime? startDate, DateTime? endDate)
         {
             if (Status == BookingStatus.Finished)
             {
                 throw new InvalidOperationException("Cannot edit a finished booking");
             }
 
-            TotalPrice = price ?? TotalPrice;
             StartDate = startDate ?? StartDate; 
             EndDate = endDate ?? EndDate; 
+
+            int totalDays = CountTotalDays();
+            TotalPrice = CountTotalPrice(PricePerHour, totalDays);
         }        
     }
 }

@@ -42,12 +42,8 @@ namespace DomainTests
         }
 
         [TestMethod]
-        public void CountTotalDays()
+        public void CanBookProperty()
         {
-            DateTime startDate = new DateTime(2024, 4, 7);
-            DateTime endDate = new DateTime(2024, 4, 14);
-            int expectedTotalDays = 8; // 14 - 7, including 7;
-            decimal price = 150.40M;
             string name = faker.Commerce.ProductName();
             string description = faker.Lorem.Sentence();
             PropertyType type = faker.PickRandom<PropertyType>();
@@ -56,14 +52,37 @@ namespace DomainTests
             string contactName = faker.Name.FirstName();
             decimal pricePerHour = faker.Finance.Amount(10, 1000);
             int capacity = faker.Random.Int(1, 20);
+            DateTime startDate = new DateTime(2024, 1, 1);
+            DateTime endDate = new DateTime(2024, 12, 31);
             Guid creatorID = Guid.NewGuid();
-
             string imageUrl = "https://domain/photo.jpeg";
             Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
-            int totalDays = property.CountTotalDays();
-            
-                       
-            Assert.AreEqual(expectedTotalDays, totalDays);           
+
+            List<Booking> bookings = new List<Booking>
+            {
+                new Booking(10, new DateTime(2024, 1, 10), new DateTime(2024, 1, 20), Guid.NewGuid(), Guid.NewGuid()),
+                new Booking(10, new DateTime(2024, 1, 21), new DateTime(2024, 1, 28), Guid.NewGuid(), Guid.NewGuid()),
+                new Booking(10, new DateTime(2024, 2, 10), new DateTime(2024, 2, 20), Guid.NewGuid(), Guid.NewGuid()),
+            };
+
+             bool canBook = property.CanBookProperty(new DateTime(2024, 1, 1), new DateTime(2024, 1, 9), bookings);
+             bool canBook2 = property.CanBookProperty(new DateTime(2024, 2, 1), new DateTime(2024, 2, 8), bookings);
+             bool canBook3 = property.CanBookProperty(new DateTime(2024, 4, 1), new DateTime(2024, 5, 1), bookings);
+             bool cannotBook = property.CanBookProperty(new DateTime(2024, 1, 1), new DateTime(2024, 1, 10), bookings);
+           bool cannotBook2 = property.CanBookProperty(new DateTime(2024, 1, 10), new DateTime(2024, 1, 20), bookings);
+           bool cannotBook3 = property.CanBookProperty(new DateTime(2024, 1, 29), new DateTime(2024, 2, 10), bookings);
+           bool cannotBook4 = property.CanBookProperty(new DateTime(2024, 3, 1), new DateTime(2025, 3, 1), bookings);
+           bool cannotBook5 = property.CanBookProperty(new DateTime(2022, 3, 1), new DateTime(2024, 3, 1), bookings);
+
+           Assert.IsTrue(canBook, "canBook");
+            Assert.IsTrue(canBook2, "canBook2");
+            Assert.IsTrue(canBook3, "canBook3");
+            Assert.IsFalse(cannotBook, "cannotBook");
+           Assert.IsFalse(cannotBook2, "cannotBook2");
+           Assert.IsFalse(cannotBook3, "cannotBook3");
+           Assert.IsFalse(cannotBook4, "cannotBook4");
+           Assert.IsFalse(cannotBook5, "cannotBook5");
+
         }
 
         [TestMethod]
@@ -126,7 +145,7 @@ namespace DomainTests
                 PricePerHour = faker.Finance.Amount(10, 1000),
                 Capacity = faker.Random.Int(1, 20),
                 StartDate = faker.Date.Soon(),
-                EndDate = faker.Date.Soon(7),
+                EndDate = faker.Date.Soon(10),
             };
 
             string name = faker.Commerce.ProductName();
@@ -149,7 +168,7 @@ namespace DomainTests
             var context = new ValidationContext(property, serviceProvider: null, items: null);
             var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
             var isValid = Validator.TryValidateObject(property, context, results, true);
-
+         
             Assert.IsTrue(isValid);         
         }
 
@@ -240,18 +259,6 @@ namespace DomainTests
                     Assert.AreEqual(expectedErrors[memberName], result.ErrorMessage);
                 }
             }
-        }
-
-        [TestMethod]
-        public void CountTotalPrice_ValidInput()
-        {
-            decimal pricePerHour = 50.00m;
-            int numberOfDays = 7;
-            decimal expectedTotalPrice = 50.00m * 24 * 7;
-
-            decimal totalPrice = Property.CountTotalPrice(pricePerHour, numberOfDays);
-
-            Assert.AreEqual(expectedTotalPrice, totalPrice);
-        }
+        }   
     }
 }
