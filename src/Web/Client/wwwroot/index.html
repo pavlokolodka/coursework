@@ -26,6 +26,20 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        function initializeFlatpickr(elementId, validDates) {
+            flatpickr(document.getElementById(elementId), {
+                //dateFormat: "Y-m-d",
+                enable: validDates,
+                /*disable: [
+                    "2024-05-05",
+                    "2024-01-20"
+                ]*/
+            });
+        }
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
