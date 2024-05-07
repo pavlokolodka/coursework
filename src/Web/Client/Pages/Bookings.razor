@@ -1,5 +1,8 @@
 ﻿@page "/bookings"
 
+<PageTitle>Bookings</PageTitle>
+
+
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
 @using Web.Shared.Dto;
@@ -87,7 +90,7 @@
     {
         @foreach (var booking in bookings)
         {
-            <div class="booking-item">
+            <div class="booking-item" @onclick="() => UpdateBooking(booking.ID.ToString(), booking.PropertyID.ToString())" style="cursor: pointer;">
                 <div class="booking-details">
                     <h4>@booking.Name</h4>
                     <p><strong>Start date</strong> @booking.StartDate</p>
@@ -134,7 +137,6 @@
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, "api/bookings");
-            Console.WriteLine($"Token {token}");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
             var response = await Http.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
@@ -147,7 +149,7 @@
 
     }   
 
-    private void NavigateToDetails(string propertyId) => NavigationManager.NavigateTo($"/property-details/{propertyId}");
+    private void UpdateBooking(string bookingId, string propertyId) => NavigationManager.NavigateTo($"/update-booking/{bookingId}?propertyId={propertyId}");
 
     private async Task CancelBooking(string bookingId)
     {
@@ -168,7 +170,6 @@
             }
 
             var request = new HttpRequestMessage(HttpMethod.Delete, $"api/bookings/{bookingId}");
-            Console.WriteLine($"Token {token}");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
             var response = await Http.SendAsync(request);
 

@@ -1,5 +1,8 @@
 ﻿@page "/update-property/{PropertyId}"
-                         
+          
+<PageTitle>Update property</PageTitle>
+
+
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
@@ -131,7 +134,6 @@
     private UpdatePropertyModel updatePropertyModel = new UpdatePropertyModel();
     private EditContext editContext;
     private bool isFormInvalid = true;
-    private ElementReference datePicker;
    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {   

@@ -1,9 +1,11 @@
-﻿@page "/book-property/{PropertyId}"
-   
-<PageTitle>Book a property</PageTitle>
+﻿@page "/update-booking/{BookingId}"
+          
+<PageTitle>Update booking</PageTitle>
+
 
 @using System.ComponentModel.DataAnnotations
-@using System.Text.Json;
+@using System.Web;
+@using Newtonsoft.Json;
 @using System.Text.Json.Serialization;
 @using System.Text;
 @using Web.Shared.Dto;
@@ -48,7 +50,7 @@
  }
 </style>
 
-<h3>Book the property @property.Name</h3>
+<h3>Update the booking @property.Name</h3>
 
 <EditForm EditContext="@editContext" OnValidSubmit="HandleSubmit">
     <DataAnnotationsValidator />
@@ -62,12 +64,12 @@
     
     <div class="form-group">
         <label for="startDate">Start Date:</label>
-        <InputDate id="startDate" @bind-Value="createBookingModel.StartDate" class="form-control" />
+        <InputDate id="startDate" @bind-Value="updateBookingModel.StartDate" class="form-control" />
     </div>
 
     <div class="form-group">
         <label for="endDate">EndDate:</label>
-        <InputDate id="endDate" @bind-Value="createBookingModel.EndDate" class="form-control" />
+        <InputDate id="endDate" @bind-Value="updateBookingModel.EndDate" class="form-control" />
     </div>    
 
     <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Book now</button>
@@ -75,10 +77,10 @@
 
 @code {
     [Parameter]
-    public string PropertyId { get; set; }
+    public string BookingId { get; set; }
     private PropertyModel property = new PropertyModel();
-    private List<DateTime> availableDates;
-    private CreateBookingModel createBookingModel = new CreateBookingModel();
+    private BookingModel booking = new BookingModel();
+    private UpdateBookingModel updateBookingModel = new UpdateBookingModel();
     private EditContext editContext;
     private bool isFormInvalid = true;
     private decimal estimatedPrice;
@@ -87,39 +89,86 @@
     {
         if (firstRender)
         {
-            availableDates = await Http.GetFromJsonAsync<List<DateTime>>($"api/properties/{PropertyId}/available-days");
+            var token = await TokenManager.GetAuthTokenAsync();
+
+            if (token == null)
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+
+            var options = new System.Text.Json.JsonSerializerOptions
+            {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
+                };
+
+            var bookingRequest = new HttpRequestMessage(HttpMethod.Get, $"api/bookings/{BookingId}");
+            bookingRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
+            var response = await Http.SendAsync(bookingRequest);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/bookings");
+                return;
+            }
+
+            string jsonString = await response.Content.ReadAsStringAsync();
+            booking = Newtonsoft.Json.JsonConvert.DeserializeObject<BookingModel>(jsonString);  
+            property = await Http.GetFromJsonAsync<PropertyModel>($"api/properties/{booking.PropertyID}", options);        
+            updateBookingModel.StartDate = booking.StartDate;
+            updateBookingModel.EndDate = booking.EndDate;
+            var availableDates = await Http.GetFromJsonAsync<List<DateTime>>($"api/properties/{booking.PropertyID}/available-days");
+            AddCurrentBookingDaysToAvailibleDays(booking.StartDate, booking.EndDate, availableDates);
             if (availableDates != null && availableDates.Count > 0)
             {
-
                 await JSRuntime.InvokeVoidAsync("initializeFlatpickrWithValidDays", "endDate", availableDates);
                 await JSRuntime.InvokeVoidAsync("initializeFlatpickrWithValidDays", "startDate", availableDates);
             }
+
+
+            StateHasChanged();
+            UpdateIsFormInvalid();
         }
     }
 
+    private void AddCurrentBookingDaysToAvailibleDays(DateTime startDate, DateTime endDate, List<DateTime> availableDates)
+    {
+        for (DateTime date = property.StartDate.Date; date <= property.EndDate.Date; date = date.AddDays(1))
+        {
+            availableDates.Add(date);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        editContext = new EditContext(createBookingModel);
+        editContext = new EditContext(updateBookingModel);
         editContext.OnFieldChanged += HandleFieldChanged;
 
-        var options = new JsonSerializerOptions
+        var token = await TokenManager.GetAuthTokenAsync();
+
+        if (token == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+
+        var options = new System.Text.Json.JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
                 Converters = { new JsonStringEnumConverter() }
             };
-        property = await Http.GetFromJsonAsync<PropertyModel>($"api/properties/{PropertyId}", options);   
-        availableDates = await Http.GetFromJsonAsync<List<DateTime>>($"api/properties/{PropertyId}/available-days");
-        createBookingModel.StartDate = availableDates.First();
-        createBookingModel.EndDate = availableDates.Last();
-        createBookingModel.PropertyID = property.ID;
-        CalculateTotalPrice();
-        UpdateIsFormInvalid();
+
+        
     }
 
     private void CalculateTotalPrice()
     {
-        int days = (int)(createBookingModel.EndDate - createBookingModel.StartDate).TotalDays + 1;
+        DateTime EndDate = updateBookingModel.EndDate;
+        DateTime StartDate = updateBookingModel.StartDate;
+        int days = (int)(EndDate - StartDate).TotalDays + 1;
         estimatedPrice = property.PricePerHour * days;
     }
 
@@ -131,8 +180,8 @@
     private void UpdateIsFormInvalid()
     {
         isFormInvalid = !editContext.Validate();
-        StateHasChanged();
         CalculateTotalPrice();
+        StateHasChanged();        
     }
 
     private async Task HandleSubmit()
@@ -145,15 +194,15 @@
              return;
          }
 
-        var options = new JsonSerializerOptions
+        var options = new System.Text.Json.JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
                 Converters = { new JsonStringEnumConverter() }
             };
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, $"api/bookings/");
-            var json = JsonSerializer.Serialize(createBookingModel, options);
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"api/bookings/{BookingId}");
+            var json = System.Text.Json.JsonSerializer.Serialize(updateBookingModel, options);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
             var response = await Http.SendAsync(request);

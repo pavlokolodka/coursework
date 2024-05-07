@@ -62,11 +62,9 @@ namespace Web.Server.Controllers
             var bookings = _bookingService.FindAllPropertyBookings(id);
            
             HashSet<DateTime> bookedDates = new HashSet<DateTime>();
-            Console.WriteLine($"Bookings any? {bookings.Any()}");
+        
             foreach (var booking in bookings)
             {
-                Console.WriteLine($"Booking {booking.ID}");
-
                 for (DateTime date = booking.StartDate.Date; date <= booking.EndDate.Date; date = date.AddDays(1))
                 {
                     bookedDates.Add(date);

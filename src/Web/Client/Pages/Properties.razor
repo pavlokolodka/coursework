@@ -1,5 +1,8 @@
 ﻿@page "/properties"
 
+<PageTitle>Properties</PageTitle>
+
+
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
 @using Web.Shared.Dto;
@@ -126,7 +129,6 @@
     private int? minCapacity;
     private string locationFilter = "";
     private decimal? minPricePerHour;
-    private decimal? maxPricePerHour;
     private List<PropertyModel> properties = new List<PropertyModel>();
     private List<PropertyModel> filteredProperties = new List<PropertyModel>();
     private List<string> validationErrors = new List<string>();

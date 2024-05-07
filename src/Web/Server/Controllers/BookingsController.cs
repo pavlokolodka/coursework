@@ -109,8 +109,7 @@ namespace Web.Server.Controllers
             try
             {
                 var booking = _bookingService.Create(bookingDto);
-                // save booked time to property as an array to validate user input based on that
-               // _propertyService.Update(new UpdatePropertyDto() { });
+          
                 string url = Url.Action("GetBooking", new { id = booking.ID });
 
                 return Created(url, booking);
@@ -122,86 +121,87 @@ namespace Web.Server.Controllers
                 };
             }           
         }
-        /*
-                [HttpPatch("{id}")]
-                public ActionResult<Property> UpdateBooking(string id, [FromBody] UpdateBookingModel dto)
+
+        [HttpPatch("{id}")]
+        public ActionResult<Property> UpdateBooking(string id, [FromBody] UpdateBookingModel dto)
+        {
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+
+            var reservation = _bookingService.Find(new FindOneBookingDto()
+            {
+                BookingID = id,
+                UserID = userId,
+                IsAdmin = isAdmin,
+            });
+
+            if (reservation == null)
+            {
+                return NotFound("Property not found");
+            }
+
+            var bookedProperty = _propertyService.Find(reservation.PropertyID.ToString());
+
+            if (bookedProperty == null)
+            {
+                return NotFound("Property not found");
+            }
+
+            if (bookedProperty.IsArchived == true)
+            {
+                return Conflict("Cannot book an archived property");
+            }
+
+            var registeredBookings = _bookingService.FindAllPropertyBookings(id);
+            bool canBookProperty = bookedProperty.CanBookProperty(dto.StartDate, dto.EndDate, registeredBookings);
+
+            if (!canBookProperty)
+            {
+                return Conflict("Cannot book a property for more than the availible time");
+            }
+
+            try
+            {
+                var updatedProperty = _bookingService.Update(new UpdateBookingDto()
                 {
-                    bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
-                    string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    UserID = userId,
+                    BookingID = id,
+                    PricePerHour = bookedProperty.PricePerHour,
+                    StartDate = dto.StartDate,
+                    EndDate = dto.EndDate,
+                    IsAdmin = isAdmin
+                });
 
-                    if (Validator.StringToGuild(id) == null)
-                    {
-                        return BadRequest("Invalid Guid format");
-                    }
+                return Ok(updatedProperty);
+            }
+            catch (Exception ex)
+            {
+                if (ex is AccessViolationException)
+                {
+                    return Forbid();
+                }
 
-                    var reservation = _bookingService.Find(new FindOneBookingDto()
-                    {
-                        BookingID = dto.BookingID.ToString(),
-                        UserID = userId,
-                        IsAdmin = isAdmin,
-                    });
+                if (ex is InvalidOperationException)
+                {
+                    return NotFound("Booking not found");
+                }
 
-                    if (reservation == null)
-                    {
-                        return NotFound("Property not found");
-                    }
+                if (ex is DataException)
+                {
+                    return Conflict("Cannot update finished booking");
+                }
 
-                    var bookedProperty = _propertyService.Find(reservation.PropertyID.ToString());
-
-                    if (bookedProperty == null)
-                    {
-                        return NotFound("Property not found");
-                    }
-
-                    if (bookedProperty.IsArchived == true)
-                    {
-                        return Conflict("Cannot book an archived property");
-                    }
-
-                    bool canBookProperty = bookedProperty.CanBookProperty(dto.StartDate, dto.EndDate, );
-
-                    if (!canBookProperty)
-                    {
-                        return Conflict("Cannot book a property for more than the availible time");
-                    }
-
-                    try
-                    {
-                        var updatedProperty = _bookingService.Update(new UpdateBookingDto()
-                        {
-                            UserID = userId,
-                            BookingID = dto.BookingID,  
-                            PricePerHour = bookedProperty.PricePerHour,
-                            StartDate  = dto.StartDate,
-                            EndDate = dto.EndDate,
-                            IsAdmin = isAdmin   
-                        });
-
-                        return Ok(updatedProperty);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is AccessViolationException)
-                        {
-                            return Forbid();
-                        }
-
-                        if (ex is InvalidOperationException)
-                        {
-                            return NotFound("Booking not found");
-                        }
-
-                        if (ex is DataException)
-                        {
-                            return Conflict("Cannot update finished booking");
-                        }
-
-                        return new ObjectResult("Internal Server Error")
-                        {
-                            StatusCode = StatusCodes.Status500InternalServerError
-                        };
-                    }
-                }*/
+                return new ObjectResult("Internal Server Error")
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
 
         [HttpDelete("{id}")]
         public ActionResult<Booking> DeleteBooking(string id)
