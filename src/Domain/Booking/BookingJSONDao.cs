@@ -1,4 +1,6 @@
-﻿namespace ReserveSpot.Domain
+﻿using System.Diagnostics;
+
+namespace ReserveSpot.Domain
 {
     public class BookingJSONDao : JSONDao<Booking>, IDao<Booking>
     {

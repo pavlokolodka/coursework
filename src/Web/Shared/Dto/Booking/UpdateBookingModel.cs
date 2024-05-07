@@ -1,21 +1,18 @@
-﻿using ReserveSpot;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ReserveSpot.Domain
+namespace Web.Shared.Dto
 {
-    public class CreateBookingDto
+    public class UpdateBookingModel
     {
-        public string Name { get; set; }    
-        public Guid PropertyID { get; set; }
-        public Guid UserID { get; set; }
-
         [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
         public DateTime StartDate { get; set; }
 
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
-
-        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-        public decimal PricePerHour { get; set; }
     }
 }

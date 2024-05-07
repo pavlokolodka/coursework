@@ -11,9 +11,11 @@ namespace Web.Server.Controllers
     public class PropertiesController : ControllerBase
     {
         private readonly PropertyService _propertyService;
-        public PropertiesController(PropertyService propertyService)
+        private readonly BookingService _bookingService;
+        public PropertiesController(PropertyService propertyService, BookingService bookingService)
         {
             _propertyService = propertyService;
+            _bookingService = bookingService;
         }
 
         [HttpGet]
@@ -31,8 +33,7 @@ namespace Web.Server.Controllers
          
             var properties = _propertyService.FindAllByUserId(userId);
             return Ok(properties);
-        }
-
+        }        
 
         [HttpGet("{id}")]
         public ActionResult<Property> GetProperty(string id)
@@ -46,6 +47,42 @@ namespace Web.Server.Controllers
             if (property == null) return NotFound("Property not found");
             return Ok(property);
         }
+
+        [HttpGet("{id}/available-days")]
+        public ActionResult<List<DateTime>> GetPropertyAvailableDays(string id)
+        {
+            if (Validator.StringToGuild(id) == null)
+            {
+                return BadRequest("Invalid Guid format");
+            }
+
+            var property = _propertyService.Find(id);
+            if (property == null) return NotFound("Property not found");
+
+            var bookings = _bookingService.FindAllPropertyBookings(id);
+           
+            HashSet<DateTime> bookedDates = new HashSet<DateTime>();
+        
+            foreach (var booking in bookings)
+            {
+                for (DateTime date = booking.StartDate.Date; date <= booking.EndDate.Date; date = date.AddDays(1))
+                {
+                    bookedDates.Add(date);
+                }
+            }
+
+            List<DateTime> availableDates = new List<DateTime>();
+            for (DateTime date = property.StartDate.Date; date <= property.EndDate.Date; date = date.AddDays(1))
+            {
+                if (!bookedDates.Contains(date))
+                {
+                    availableDates.Add(date);
+                }
+            }
+
+            return Ok(availableDates);
+        }
+
 
         [HttpPost]
         [Authorize]

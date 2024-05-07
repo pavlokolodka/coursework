@@ -17,12 +17,16 @@ namespace ReserveSpot.Domain
         public string? ContactPhone { get; set; }
         public PropertyType? Type { get; set; }
         public string? Location { get; set; }
+        
         [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
         public decimal? PricePerHour { get; set; }
+      
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
         public int? Capacity { get; set; }
+        
         [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
         public DateTime? StartDate { get; set; }
+     
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime? EndDate { get; set; }      
     }

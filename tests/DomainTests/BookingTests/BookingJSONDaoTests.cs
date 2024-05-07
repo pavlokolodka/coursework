@@ -15,8 +15,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             BookingJSONDao dao = new BookingJSONDao();
-            
-            Booking newBooking = new Booking(startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking newBooking = new Booking(name, 1, startDate, endDate, userId, propertyId);
             dao.Create(newBooking);
 
             var createdBooking = dao.FindOne(booking => booking.ID == newBooking.ID);
@@ -38,7 +38,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             BookingJSONDao dao = new BookingJSONDao();
-            Booking newBooking = new Booking(startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking newBooking = new Booking(name, 0, startDate, endDate, userId, propertyId);
 
             try
             {
@@ -59,13 +60,13 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             BookingJSONDao dao = new BookingJSONDao();
-            Booking newBooking = new Booking(startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking newBooking = new Booking(name, 100, startDate, endDate, userId, propertyId);
             dao.Create(newBooking);
 
             DateTime newEndDate = endDate.AddHours(1);
             newBooking.Edit(null, newEndDate);
             var updatedBooking = dao.Update(booking => booking.ID == newBooking.ID, newBooking);
-
 
             Assert.AreEqual(startDate, updatedBooking.StartDate);
             Assert.AreEqual(newEndDate, updatedBooking.EndDate);

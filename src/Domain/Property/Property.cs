@@ -41,16 +41,17 @@ namespace ReserveSpot.Domain
 
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
+
+      /*  public DateTime BookedStartDate { get; set; }
+
+        public DateTime BookedEndDate { get; set; }*/
+                
         public bool IsArchived { get; set; } = false;
 
         [Required(ErrorMessage = "UserID is required")]
         public Guid UserID { get; set; }
                
-        public static int PropetryCount;
-        public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
-        {
-            return pricePerHour * 24 * numberOfDays; 
-        }
+        public static int PropetryCount;     
 
         public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, string imageUrl, Guid creatorID)
         {
@@ -83,6 +84,45 @@ namespace ReserveSpot.Domain
 
             StartDate = updateDetail.StartDate ?? StartDate;
             EndDate = updateDetail.EndDate ?? EndDate;          
+        }    
+
+     /*   public bool CanBookProperty(DateTime? startDate, DateTime? endDate)
+        {
+            startDate = startDate ?? StartDate;  
+            endDate = endDate ?? EndDate;
+            
+            if (startDate >= StartDate || endDate <= EndDate) return false;
+
+            return true;
+        }*/
+
+        public bool CanBookProperty(DateTime desiredStartDate, DateTime desiredEndDate, List<Booking> bookings)
+        {
+            if (desiredStartDate < StartDate || desiredEndDate > EndDate) return false;
+
+            if (bookings.Count == 0) return true;         
+            
+            foreach (Booking booking in bookings) {               
+                
+                // # = start/end of booking
+                // - = free/booked time
+                // | = availible time
+                    
+                if (
+                    // |#--START--#---|
+                    (desiredStartDate <= booking.EndDate && desiredStartDate >= booking.StartDate) ||
+                    // |--#--END---#--|
+                    (desiredEndDate >= booking.StartDate && desiredEndDate <= booking.EndDate) ||
+                    // |START-#--#-END|
+                    (desiredStartDate <= booking.StartDate && desiredEndDate >= booking.EndDate)
+
+                    )
+                {
+                    return false; 
+                }             
+            }
+
+            return true;     
         }
     }
 

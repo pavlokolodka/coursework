@@ -1,9 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 
 namespace ReserveSpot.Domain
 {
     public class Booking: AbstractEntity
     {
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; }
+
         [Required(ErrorMessage = "PropertyID is required")]
         public Guid PropertyID { get; set; }
 
@@ -11,6 +16,7 @@ namespace ReserveSpot.Domain
         public Guid UserID { get; set; }
 
         [Required(ErrorMessage = "Status is required")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public BookingStatus Status { get; set; }
 
         [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
@@ -19,14 +25,27 @@ namespace ReserveSpot.Domain
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
 
-        public Booking(DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+        [Range(1, double.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
+        public decimal TotalPrice { get; set; }
+
+        [Range(1, double.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
+        public decimal PricePerHour { get; set; }
+
+        public Booking(string name, decimal pricePerHour, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+            Name = name;
+            PricePerHour = pricePerHour;
             StartDate = startDate;
             EndDate = endDate;
             UserID = userId;
             PropertyID = propertyId;
             Status = BookingStatus.Registered;
+            int totalDays = CountTotalDays();
+            TotalPrice = CountTotalPrice(pricePerHour, totalDays);
         }
-        
+        public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
+        {
+            return pricePerHour * 24 * numberOfDays;
+        }
         public void CheckBookingStatus()
         {
             if (DateTime.Now > EndDate)
@@ -34,6 +53,13 @@ namespace ReserveSpot.Domain
                 Status = BookingStatus.Finished;
             }       
         }
+        public int CountTotalDays()
+        {
+            var timeSpan = EndDate - StartDate;
+
+            return (int)(timeSpan.TotalDays) + 1;
+        }
+
 
         public void Edit(DateTime? startDate, DateTime? endDate)
         {
@@ -44,6 +70,9 @@ namespace ReserveSpot.Domain
 
             StartDate = startDate ?? StartDate; 
             EndDate = endDate ?? EndDate; 
+
+            int totalDays = CountTotalDays();
+            TotalPrice = CountTotalPrice(PricePerHour, totalDays);
         }        
     }
 }

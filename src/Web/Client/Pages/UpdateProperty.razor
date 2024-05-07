@@ -1,5 +1,8 @@
 ﻿@page "/update-property/{PropertyId}"
-                         
+          
+<PageTitle>Update property</PageTitle>
+
+
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
@@ -9,6 +12,7 @@
 @inject NavigationManager NavigationManager
 @using Web.Shared.Dto.Property;
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
 <style>
 .validation-message {
@@ -35,6 +39,14 @@
     border-color: #007bff;
     cursor: pointer;
 }
+
+.form-control {
+    background: none !important; 
+}
+
+ .valid.modified {
+    outline: none !important; 
+ }
 </style>
 
 
@@ -122,6 +134,16 @@
     private UpdatePropertyModel updatePropertyModel = new UpdatePropertyModel();
     private EditContext editContext;
     private bool isFormInvalid = true;
+   
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {   
+
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "endDate");
+            await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "startDate");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

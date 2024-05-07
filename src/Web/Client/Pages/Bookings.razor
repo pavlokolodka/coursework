@@ -1,0 +1,189 @@
+﻿@page "/bookings"
+
+<PageTitle>Bookings</PageTitle>
+
+
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using Web.Shared.Dto;
+@using Web.Shared;
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject TokenManager TokenManager
+
+<style>
+.search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px; 
+}
+
+.search-button {
+    padding: 8px 16px;
+    background-color: #007bff; 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+    background-color: #0056b3; 
+}
+
+.booking-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+    .booking-item {
+    display: flex;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.image-block img {
+    width: 200px;
+    height: 200px;
+    margin-right: 20px;
+}
+
+    .booking-details {
+    flex-grow: 1;
+}
+
+    .booking-details h4 {
+    margin-top: 0;
+}
+
+.btn-warning {
+        background-color: #cb1c2d;
+}
+.btn-warning:hover {
+            background-color: #b50113;
+}
+
+</style>
+
+
+
+ <NotificationComponent @ref="notificationComponent" />
+
+<div class="booking-list">
+    @if (!bookings.Any())
+    {
+        <div>No bookings found</div>
+    } else
+    {
+        @foreach (var booking in bookings)
+        {
+            <div class="booking-item" @onclick="() => UpdateBooking(booking.ID.ToString(), booking.PropertyID.ToString())" style="cursor: pointer;">
+                <div class="booking-details">
+                    <h4>@booking.Name</h4>
+                    <p><strong>Start date</strong> @booking.StartDate</p>
+                    <p><strong>End date</strong> @booking.EndDate</p>
+                    <p><strong>Price per hour:</strong> @booking.PricePerHour</p>
+                    <p><strong>Total price:</strong> @booking.TotalPrice</p>
+                    <p><strong>Status:</strong> @booking.Status</p>
+
+                    @if (booking.Status == BookingStatus.Registered)
+                    {
+                        <button class="btn btn-warning" @onclick="() => CancelBooking(booking.ID.ToString())">Cancel Booking</button>
+                    }
+                </div>
+            </div>
+        }
+    }
+   
+</div>
+
+
+@code {
+    private List<BookingModel> bookings = new List<BookingModel>();
+    private List<string> validationErrors = new List<string>();
+
+    private NotificationComponent notificationComponent;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        try
+        {
+
+            string token = await TokenManager.GetAuthTokenAsync();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/bookings");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
+            var response = await Http.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            bookings = JsonSerializer.Deserialize<List<BookingModel>>(json, options);
+
+        } catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+    }   
+
+    private void UpdateBooking(string bookingId, string propertyId) => NavigationManager.NavigateTo($"/update-booking/{bookingId}?propertyId={propertyId}");
+
+    private async Task CancelBooking(string bookingId)
+    {
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+        try
+        {
+
+            string token = await TokenManager.GetAuthTokenAsync();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login", forceLoad: true);
+                return;
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/bookings/{bookingId}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var removedBooking = bookings.Find(booking => booking.ID.ToString() == bookingId);
+                bookings.Remove(removedBooking);
+                notificationComponent.Inform("Successfully canceled the booking");
+            } 
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+}
