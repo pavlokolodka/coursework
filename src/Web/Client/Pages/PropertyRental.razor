@@ -175,6 +175,7 @@
             }
 
             var request = new HttpRequestMessage(HttpMethod.Get, "api/properties/my");
+            Console.WriteLine($"Token {token}");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
             var response = await Http.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();

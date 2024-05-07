@@ -9,9 +9,7 @@ namespace Web.Shared.Dto
         {
             var property = validationContext.ObjectType.GetProperty("EndDate");
             var endDate = (DateTime)(property.GetValue(validationContext.ObjectInstance) ?? DateTime.MaxValue);
-            Console.WriteLine($"IS LESS? {((DateTime)value) < DateTime.Now.AddDays(-1)}");
-            Console.WriteLine($"IS LESS1? {(DateTime)value < DateTime.Now}");
-            Console.WriteLine($"IS LESS1? {(DateTime)value}");
+    
             //add days -1 to compare starting from 00:00:00
             if (value != null && ((DateTime)value >= endDate || ((DateTime)value) < DateTime.Now.AddDays(-1)))
             {

@@ -80,9 +80,17 @@
         <p><strong>Capacity:</strong> @property.Capacity</p>
         <p><strong>Available Dates:</strong> @property.StartDate.ToShortDateString() - @property.EndDate.ToShortDateString()</p>
 
+        @if (Token != null)
+        { 
             @if (isUserProperty)
-        {
-          <button class="floating-button" @onclick="() => NavigateToUpdateProperty()">Update Property</button>
+            {
+                <button class="floating-button" @onclick="() => NavigateToUpdateProperty()">Update the property</button>
+            }
+            else
+            {
+               <button class="floating-button" @onclick="() => NavigateToBookProperty()">Book the property</button>
+               
+            }     
         }
 
     </div>
@@ -102,6 +110,7 @@ else
     public string PropertyId { get; set; }
     private PropertyModel property;
     private bool isUserProperty = false;
+    private string? Token;
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,6 +122,10 @@ else
         property = await Http.GetFromJsonAsync<PropertyModel>($"api/properties/{PropertyId}", options);
 
         string userId = await TokenManager.GetUserIdAsync();
+        Token = await TokenManager.GetAuthTokenAsync();
+
+        Console.WriteLine($"Token {Token}");
+        Console.WriteLine($"Token! {Token != null}");
 
         if (!string.IsNullOrEmpty(userId))
         {
@@ -124,7 +137,9 @@ else
     {     
         NavigationManager.NavigateTo($"/update-property/{PropertyId}");
     }
-
-   
+    private void NavigateToBookProperty()
+    {
+        NavigationManager.NavigateTo($"/book-property/{PropertyId}");
+    }  
 
 }

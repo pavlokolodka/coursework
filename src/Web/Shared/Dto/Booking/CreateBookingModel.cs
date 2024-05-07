@@ -3,8 +3,7 @@
     public class CreateBookingModel
     {
         public Guid PropertyID { get; set; }
-        public Guid UserID { get; set; }
-
+      
         [StartDateLessThanEndDate(ErrorMessage = "StartDate must be less than or equal to EndDate")]
         public DateTime StartDate { get; set; }
 

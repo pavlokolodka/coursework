@@ -14,7 +14,7 @@ namespace ReserveSpot.Domain
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
-        public decimal TotalPrice { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
+        public decimal PricePerHour { get; set; }
     }
 }

@@ -22,10 +22,10 @@ namespace Web.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Booking>> GetAllProperties()
+        public ActionResult<IEnumerable<Booking>> GetAllUserBookings()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var bookings = _bookingService.FindAll(userId);
+            var bookings = _bookingService.FindAllUserBookings(userId);
             return Ok(bookings);
         }    
 
@@ -33,25 +33,42 @@ namespace Web.Server.Controllers
         public ActionResult<Booking> GetBooking(string id)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
             if (Validator.StringToGuild(id) == null)
             {
                 return BadRequest("Invalid Guid format");
             }
 
-            var booking = _bookingService.Find(new FindOneBookingDto()
+            try
             {
-                BookingID = id,
-                UserID = userId
-            });
+                var booking = _bookingService.Find(new FindOneBookingDto()
+                {
+                    BookingID = id,
+                    UserID = userId,
+                    IsAdmin = isAdmin
+                });
 
-            if (booking == null) return NotFound("Booking not found");
-            
-            return Ok(booking);
+                if (booking == null) return NotFound("Booking not found");
+
+                return Ok(booking);
+            }
+            catch (Exception ex)
+            {
+                if (ex is AccessViolationException)
+                {
+                    return Forbid();
+                }
+              
+                return new ObjectResult("Internal Server Error")
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
         }
 
         [HttpPost]
         [Authorize]
-        public ActionResult<Property> CreateProperty([FromBody] CreateBookingModel dto)
+        public ActionResult<Booking> CreateBooking([FromBody] CreateBookingModel dto)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var userGuid = Validator.StringToGuild(userId);
@@ -66,63 +83,127 @@ namespace Web.Server.Controllers
                 return NotFound("Property not found");
             }
 
-            int totalBookedDays = bookedProperty.CountTotalDays();
-            decimal totalPrice = Property.CountTotalPrice(bookedProperty.PricePerHour, totalBookedDays);
+            if (bookedProperty.IsArchived == true)
+            {
+                return Conflict("Cannot book an archived property");
+            }
 
+            var registeredBookings = _bookingService.FindAllPropertyBookings(dto.PropertyID.ToString());
+            bool canBookProperty = bookedProperty.CanBookProperty(dto.StartDate, dto.EndDate, registeredBookings);
+
+            if (!canBookProperty)
+            {
+                return Conflict("Cannot book a property for more than the availible time");
+            }
+            
             var bookingDto = new CreateBookingDto()
             {
                 UserID = (Guid)userGuid,
                 PropertyID = dto.PropertyID,
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
-                TotalPrice = totalPrice
+                PricePerHour = bookedProperty.PricePerHour
             };
-
-            var booking = _bookingService.Create(bookingDto);
-
-            string url = Url.Action("GetBooking", new { id = booking.ID });
-
-            return Created(url, booking);
-        }
-
-       /* [HttpPatch("{id}")]
-        [Authorize]
-        public ActionResult<Property> UpdateProperty(string id, [FromBody] UpdatePropertyDto dto)
-        {
-            bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            if (Validator.StringToGuild(id) == null)
-            {
-                return BadRequest("Invalid Guid format");
-            }
 
             try
             {
-                var updatedProperty = _bookingService.Update(userId, id, dto, isAdmin);
-                return Ok(updatedProperty);
-            }
-            catch (Exception ex)
+                var booking = _bookingService.Create(bookingDto);
+                // save booked time to property as an array to validate user input based on that
+               // _propertyService.Update(new UpdatePropertyDto() { });
+                string url = Url.Action("GetBooking", new { id = booking.ID });
+
+                return Created(url, booking);
+            } catch (Exception ex)
             {
-                if (ex is AccessViolationException)
-                {
-                    return Forbid();
-                }
-
-                if (ex is InvalidOperationException)
-                {
-                    return NotFound();
-                }
-
                 return new ObjectResult("Internal Server Error")
                 {
                     StatusCode = StatusCodes.Status500InternalServerError
                 };
-            }
-        }*/
+            }           
+        }
+        /*
+                [HttpPatch("{id}")]
+                public ActionResult<Property> UpdateBooking(string id, [FromBody] UpdateBookingModel dto)
+                {
+                    bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
+                    string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                    if (Validator.StringToGuild(id) == null)
+                    {
+                        return BadRequest("Invalid Guid format");
+                    }
+
+                    var reservation = _bookingService.Find(new FindOneBookingDto()
+                    {
+                        BookingID = dto.BookingID.ToString(),
+                        UserID = userId,
+                        IsAdmin = isAdmin,
+                    });
+
+                    if (reservation == null)
+                    {
+                        return NotFound("Property not found");
+                    }
+
+                    var bookedProperty = _propertyService.Find(reservation.PropertyID.ToString());
+
+                    if (bookedProperty == null)
+                    {
+                        return NotFound("Property not found");
+                    }
+
+                    if (bookedProperty.IsArchived == true)
+                    {
+                        return Conflict("Cannot book an archived property");
+                    }
+
+                    bool canBookProperty = bookedProperty.CanBookProperty(dto.StartDate, dto.EndDate, );
+
+                    if (!canBookProperty)
+                    {
+                        return Conflict("Cannot book a property for more than the availible time");
+                    }
+
+                    try
+                    {
+                        var updatedProperty = _bookingService.Update(new UpdateBookingDto()
+                        {
+                            UserID = userId,
+                            BookingID = dto.BookingID,  
+                            PricePerHour = bookedProperty.PricePerHour,
+                            StartDate  = dto.StartDate,
+                            EndDate = dto.EndDate,
+                            IsAdmin = isAdmin   
+                        });
+
+                        return Ok(updatedProperty);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex is AccessViolationException)
+                        {
+                            return Forbid();
+                        }
+
+                        if (ex is InvalidOperationException)
+                        {
+                            return NotFound("Booking not found");
+                        }
+
+                        if (ex is DataException)
+                        {
+                            return Conflict("Cannot update finished booking");
+                        }
+
+                        return new ObjectResult("Internal Server Error")
+                        {
+                            StatusCode = StatusCodes.Status500InternalServerError
+                        };
+                    }
+                }*/
 
         [HttpDelete("{id}")]
-        public ActionResult<Property> DeleteProperty(string id)
+        public ActionResult<Booking> DeleteBooking(string id)
         {
             bool isAdmin = Convert.ToBoolean(HttpContext.Items["IsAdmin"]);
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;

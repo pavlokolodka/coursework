@@ -13,30 +13,59 @@ namespace ReserveSpot.Domain
 
         public Booking Create(CreateBookingDto payload)
         {
-            Booking newBooking = new(payload.TotalPrice, payload.StartDate, payload.EndDate, payload.UserID, payload.PropertyID);
+            Booking newBooking = new(payload.PricePerHour, payload.StartDate, payload.EndDate, payload.UserID, payload.PropertyID);
 
             return bookingDao.Create(newBooking);
         }
 
         public Booking Update(UpdateBookingDto payload)
         {
-            throw new NotImplementedException();
+            var booking = bookingDao.FindOne(booking => booking.ID.ToString() == payload.BookingID);
 
+            if (booking == null)
+            {
+                throw new InvalidOperationException("Booking not found");
+            };
+
+            if (booking.UserID.ToString() != payload.UserID && !payload.IsAdmin)
+            {
+                throw new AccessViolationException("Cannot edit another user property");
+            }
+
+            if (booking.Status == BookingStatus.Finished)
+            {
+                throw new DataException("Cannot update finished booking");
+            }
+
+            booking.Edit(payload.StartDate, payload.EndDate);
+
+            return bookingDao.Update(booking => booking.ID.ToString() == payload.BookingID, booking);
         }
 
         public Booking? Find(FindOneBookingDto payload)
         {
-            return bookingDao.FindOne(booking => booking.UserID.Equals(payload.UserID) && booking.ID.Equals(payload.BookingID));
+            var booking = bookingDao.FindOne(booking => booking.ID.ToString() == payload.BookingID);
+            if (booking != null && booking.UserID.ToString() != payload.UserID && !payload.IsAdmin)
+            {
+                throw new AccessViolationException("Cannot access another user property");
+            }
+
+            return booking;
         }
 
-        public List<Booking> FindAll(string userId)
+        public List<Booking> FindAllUserBookings(string userId)
         {
-            return bookingDao.FindMany(booking => booking.UserID.Equals(userId));   
+            return bookingDao.FindMany(booking => booking.UserID.ToString() == userId);   
+        }
+
+        public List<Booking> FindAllPropertyBookings(string propertyId)
+        {
+            return bookingDao.FindMany(booking => booking.PropertyID.ToString() == propertyId);
         }
 
         public bool Delete(DeleteBookingDto payload)
         {
-            var booking = bookingDao.FindOne(booking => booking.ID.Equals(payload.BookingID));
+            var booking = bookingDao.FindOne(booking => booking.ID.ToString() == payload.BookingID);
 
             if (booking == null) {
                 throw new InvalidOperationException("Booking not found");
@@ -53,7 +82,7 @@ namespace ReserveSpot.Domain
             }
 
 
-            bookingDao.Delete(booking => booking.ID.Equals(payload.BookingID));
+            bookingDao.Delete(booking => booking.ID.ToString() == payload.BookingID);
 
             return true;
         }

@@ -9,6 +9,7 @@
 @inject NavigationManager NavigationManager
 @using Web.Shared.Dto.Property;
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
 <style>
 .validation-message {
@@ -35,8 +36,31 @@
     border-color: #007bff;
     cursor: pointer;
 }
+
+.form-control {
+    background: none !important; /* Removes background */
+}
+
+ .valid.modified {
+    outline: none !important; /* Removes background */
+ }
 </style>
 
+
+@* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    function initializeFlatpickr(elementId) {
+        flatpickr(document.getElementById(elementId), {
+            dateFormat: "Y-m-d",
+            disable: [
+                "2024-05-05",
+                "2024-01-20"
+            ]
+        });
+    }
+</script> *@
 
 <h3>Update Property</h3>
 
@@ -122,6 +146,30 @@
     private UpdatePropertyModel updatePropertyModel = new UpdatePropertyModel();
     private EditContext editContext;
     private bool isFormInvalid = true;
+
+    private ElementReference datePicker;
+    private List<DateTime> validDatesList = new List<DateTime> {
+            new DateTime(2024, 05, 05),
+            new DateTime(2024, 05, 10),
+            new DateTime(2024, 05, 15)
+        };
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+    
+
+        if (firstRender)
+        {
+            var validDatesArray = validDatesList.Select(date => date.ToString("yyyy-MM-dd")).ToArray();
+            await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "endDate", validDatesArray);
+            await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "startDate", validDatesArray);
+
+            // await JSRuntime.InvokeVoidAsync("flatpickr", datePicker, new
+            // {
+            //     dateFormat = "Y-m-d",
+            //     disable = new[] { "2024-01-10", "2024-01-20" } // Dates to disable
+            // });
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

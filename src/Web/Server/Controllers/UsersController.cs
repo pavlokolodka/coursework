@@ -100,7 +100,7 @@ namespace Web.Server.Controllers
                 return Forbid();
             }
 
-            var userBookings = _bookingService.FindAll(userId);
+            var userBookings = _bookingService.FindAllUserBookings(userId);
 
             if (userBookings.Count > 0) {
                 return Conflict("Cannot delete user with active bookings");
