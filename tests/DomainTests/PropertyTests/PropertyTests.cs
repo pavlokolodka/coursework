@@ -1,4 +1,5 @@
 ﻿using Bogus;
+using Bogus.DataSets;
 using ReserveSpot.Domain;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -60,9 +61,9 @@ namespace DomainTests
 
             List<Booking> bookings = new List<Booking>
             {
-                new Booking(10, new DateTime(2024, 1, 10), new DateTime(2024, 1, 20), Guid.NewGuid(), Guid.NewGuid()),
-                new Booking(10, new DateTime(2024, 1, 21), new DateTime(2024, 1, 28), Guid.NewGuid(), Guid.NewGuid()),
-                new Booking(10, new DateTime(2024, 2, 10), new DateTime(2024, 2, 20), Guid.NewGuid(), Guid.NewGuid()),
+                new Booking(name, 10, new DateTime(2024, 1, 10), new DateTime(2024, 1, 20), Guid.NewGuid(), Guid.NewGuid()),
+                new Booking(name, 21, new DateTime(2024, 1, 21), new DateTime(2024, 1, 28), Guid.NewGuid(), Guid.NewGuid()),
+                new Booking(name, 10, new DateTime(2024, 2, 10), new DateTime(2024, 2, 20), Guid.NewGuid(), Guid.NewGuid()),
             };
 
              bool canBook = property.CanBookProperty(new DateTime(2024, 1, 1), new DateTime(2024, 1, 9), bookings);

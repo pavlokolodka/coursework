@@ -17,9 +17,10 @@ namespace DomainTests
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
             decimal expectedTotalPrice = price * 8 * 24;
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
-
+            Assert.AreEqual(name, booking.Name);
             Assert.AreEqual(startDate, booking.StartDate);
             Assert.AreEqual(endDate, booking.EndDate);
             Assert.AreEqual(price, booking.PricePerHour);
@@ -38,8 +39,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
-
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
 
             Assert.AreEqual(expectedTotalDays, booking.CountTotalDays());
@@ -65,8 +66,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
-
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
             var context = new ValidationContext(booking);
             var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
@@ -84,8 +85,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 0M;
-
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
             var context = new ValidationContext(booking);
             var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
@@ -118,8 +119,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
-
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
             DateTime newStartDate = startDate.AddDays(10);
             DateTime newEndDate = endDate.AddDays(10);
@@ -141,8 +142,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
-
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
             DateTime newStartDate = new DateTime(2024, 4, 17);
             DateTime newEndDate = new DateTime(2024, 4, 10);
@@ -164,8 +165,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
-
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
             booking.CheckBookingStatus();
 
@@ -191,7 +192,8 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
-            Booking booking = new Booking(price, startDate, endDate, userId, propertyId);
+            string name = "Test booking";
+            Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
             DateTime newStartDate = DateTime.Now;
             DateTime newEndDate = DateTime.Now.AddDays(3);
