@@ -98,6 +98,7 @@ namespace Web.Server.Controllers
             
             var bookingDto = new CreateBookingDto()
             {
+                Name = bookedProperty.Name,
                 UserID = (Guid)userGuid,
                 PropertyID = dto.PropertyID,
                 StartDate = dto.StartDate,

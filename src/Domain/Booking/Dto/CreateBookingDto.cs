@@ -5,6 +5,7 @@ namespace ReserveSpot.Domain
 {
     public class CreateBookingDto
     {
+        public string Name { get; set; }    
         public Guid PropertyID { get; set; }
         public Guid UserID { get; set; }
 

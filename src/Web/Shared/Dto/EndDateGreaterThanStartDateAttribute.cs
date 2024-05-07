@@ -10,7 +10,7 @@ namespace Web.Shared.Dto
     
             var startDate = (DateTime)(property.GetValue(validationContext.ObjectInstance) ?? DateTime.MinValue);
 
-            if (value != null && (DateTime)value < startDate.AddDays(1))
+            if (value != null && (DateTime)value < startDate)
             {
                 return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
             }

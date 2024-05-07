@@ -1,4 +1,5 @@
 ﻿@page "/add-property"
+
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json;
 @using System.Text.Json.Serialization;
@@ -7,6 +8,7 @@
 @inject TokenManager TokenManager
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
 <style>
 .validation-message {
@@ -33,6 +35,14 @@
     border-color: #007bff;
     cursor: pointer;
 }
+
+    .form-control {
+        background: none !important; 
+    }
+
+    .valid.modified {
+        outline: none !important; 
+    }
 </style>
 
 
@@ -117,6 +127,16 @@
     {
         editContext = new EditContext(addPropertyModel);
         editContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "endDate");
+            await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "startDate");
+        }
     }
 
     private void HandleFieldChanged(object sender, FieldChangedEventArgs e)

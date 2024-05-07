@@ -1,11 +1,16 @@
-﻿using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace Web.Shared.Dto.Booking
+namespace Web.Shared.Dto
 {
     public class BookingModel
     {
+        public Guid ID { get; set; }
+
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; }
+
         [Required(ErrorMessage = "PropertyID is required")]
         public Guid PropertyID { get; set; }
 

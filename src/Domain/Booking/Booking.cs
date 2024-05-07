@@ -6,6 +6,9 @@ namespace ReserveSpot.Domain
 {
     public class Booking: AbstractEntity
     {
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; }
+
         [Required(ErrorMessage = "PropertyID is required")]
         public Guid PropertyID { get; set; }
 
@@ -28,7 +31,8 @@ namespace ReserveSpot.Domain
         [Range(1, double.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
         public decimal PricePerHour { get; set; }
 
-        public Booking(decimal pricePerHour, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+        public Booking(string name, decimal pricePerHour, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+            Name = name;
             PricePerHour = pricePerHour;
             StartDate = startDate;
             EndDate = endDate;
@@ -53,7 +57,7 @@ namespace ReserveSpot.Domain
         {
             var timeSpan = EndDate - StartDate;
 
-            return (int)timeSpan.TotalDays + 1;
+            return (int)(timeSpan.TotalDays) + 1;
         }
 
 

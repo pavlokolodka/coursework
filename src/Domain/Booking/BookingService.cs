@@ -13,7 +13,7 @@ namespace ReserveSpot.Domain
 
         public Booking Create(CreateBookingDto payload)
         {
-            Booking newBooking = new(payload.PricePerHour, payload.StartDate, payload.EndDate, payload.UserID, payload.PropertyID);
+            Booking newBooking = new(payload.Name, payload.PricePerHour, payload.StartDate, payload.EndDate, payload.UserID, payload.PropertyID);
 
             return bookingDao.Create(newBooking);
         }

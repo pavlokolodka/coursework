@@ -122,10 +122,7 @@ else
         property = await Http.GetFromJsonAsync<PropertyModel>($"api/properties/{PropertyId}", options);
 
         string userId = await TokenManager.GetUserIdAsync();
-        Token = await TokenManager.GetAuthTokenAsync();
-
-        Console.WriteLine($"Token {Token}");
-        Console.WriteLine($"Token! {Token != null}");
+        Token = await TokenManager.GetAuthTokenAsync();       
 
         if (!string.IsNullOrEmpty(userId))
         {

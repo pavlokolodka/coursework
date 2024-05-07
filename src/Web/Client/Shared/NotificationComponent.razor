@@ -1,5 +1,5 @@
 ﻿<style>
-.notification {
+.error-notification {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -13,6 +13,20 @@
     max-width: 300px;
 }
 
+    .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px;
+        background-color: rgba(106, 99, 71);
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+        width: auto;
+        max-width: 300px;
+    }
+
 .notification div {
     margin-top: 5px;
     text-align: left;
@@ -22,10 +36,17 @@
 
 @if (showNotification)
 {
-        <div class="notification">
+    <div class="error-notification">
         @foreach (var error in messages)
         {
                     <div>@error</div>
+        }
+        </div>
+
+         <div class="notification">
+        @foreach (var message in messages)
+        {
+            <div>@message</div>
         }
         </div>
 }
@@ -44,6 +65,19 @@
             showNotification = false;
             errorMessages.RemoveAll(s => true);
             InvokeAsync(StateHasChanged); 
+        });
+    }
+
+    public void Inform(string infoMessage)
+    {
+        showNotification = true;
+        messages.Add(infoMessage);
+        InvokeAsync(StateHasChanged);
+        Task.Delay(5000).ContinueWith(t =>
+        {
+            showNotification = false;
+            messages.RemoveAll(m => true);
+            InvokeAsync(StateHasChanged);
         });
     }
 }

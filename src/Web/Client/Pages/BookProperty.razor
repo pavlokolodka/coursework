@@ -7,7 +7,6 @@
 @using Web.Shared.Dto;
 @inject TokenManager TokenManager
 @inject NavigationManager NavigationManager
-@using Web.Shared.Dto.Booking;
 @using Web.Shared.Dto.Property;
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
@@ -90,8 +89,8 @@
             if (availableDates != null && availableDates.Count > 0)
             {
 
-                await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "endDate", availableDates);
-                await JSRuntime.InvokeVoidAsync("initializeFlatpickr", "startDate", availableDates);
+                await JSRuntime.InvokeVoidAsync("initializeFlatpickrWithValidDays", "endDate", availableDates);
+                await JSRuntime.InvokeVoidAsync("initializeFlatpickrWithValidDays", "startDate", availableDates);
             }
         }
     }
@@ -159,7 +158,7 @@
 
             if (response.IsSuccessStatusCode)
             {
-                NavigationManager.NavigateTo("/rental", forceLoad: true);
+                NavigationManager.NavigateTo("/bookings", forceLoad: true);
                 return;
             }
 
