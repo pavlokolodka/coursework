@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Web.Client.Shared
 {
-    public class TokenManager
+    public class LocalStorageManager
     {
         private readonly ILocalStorageService _localStorage;
       
-        public TokenManager(ILocalStorageService localStorage)
+        public LocalStorageManager(ILocalStorageService localStorage)
         {
             _localStorage = localStorage;
         }
@@ -33,9 +33,24 @@ namespace Web.Client.Shared
             return id;
         }
 
+        public async Task<bool> GetIsAdmin()
+        {
+            string flag = await _localStorage.GetItemAsStringAsync("isAdmin");
+            if (bool.TryParse(flag, out bool isAdmin))
+            {
+                return isAdmin;
+            }
+            return false; 
+        }
+
         public async Task SetUserId(string userId)
         {
             await _localStorage.SetItemAsync("userId", userId);         
+        }
+
+        public async Task SetIsAdmin(bool isAdmin)
+        {
+            await _localStorage.SetItemAsync("isAdmin", isAdmin);
         }
 
         public async Task SetToken(string token)
@@ -51,6 +66,13 @@ namespace Web.Client.Shared
         public async Task RemoveUserId()
         {
             await _localStorage.RemoveItemAsync("userId");
+        }
+
+        public async Task ClearAll()
+        {
+            await _localStorage.RemoveItemAsync("userId");
+            await _localStorage.RemoveItemAsync("authToken");
+            await _localStorage.RemoveItemAsync("isAdmin");
         }
     }
 }

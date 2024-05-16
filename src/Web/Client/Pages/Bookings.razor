@@ -9,7 +9,7 @@
 @using Web.Shared;
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject TokenManager TokenManager
+@inject LocalStorageManager LocalStorageManager
 
 <style>
 .search-bar {
@@ -95,7 +95,7 @@
                     <h4>@booking.Name</h4>
                     <p><strong>Start date</strong> @booking.StartDate</p>
                     <p><strong>End date</strong> @booking.EndDate</p>
-                    <p><strong>Price per hour:</strong> @booking.PricePerHour</p>
+                    <p><strong>Price per night:</strong> @booking.PricePerNight</p>
                     <p><strong>Total price:</strong> @booking.TotalPrice</p>
                     <p><strong>Status:</strong> @booking.Status</p>
 
@@ -128,7 +128,7 @@
         try
         {
 
-            string token = await TokenManager.GetAuthTokenAsync();
+            string token = await LocalStorageManager.GetAuthTokenAsync();
 
             if (string.IsNullOrEmpty(token))
             {
@@ -161,7 +161,7 @@
         try
         {
 
-            string token = await TokenManager.GetAuthTokenAsync();
+            string token = await LocalStorageManager.GetAuthTokenAsync();
 
             if (string.IsNullOrEmpty(token))
             {

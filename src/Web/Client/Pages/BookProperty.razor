@@ -7,7 +7,7 @@
 @using System.Text.Json.Serialization;
 @using System.Text;
 @using Web.Shared.Dto;
-@inject TokenManager TokenManager
+@inject LocalStorageManager LocalStorageManager
 @inject NavigationManager NavigationManager
 @using Web.Shared.Dto.Property;
 @inject HttpClient Http
@@ -48,6 +48,9 @@
  }
 </style>
 
+
+<NotificationComponent @ref="notificationComponent" />
+
 <h3>Book the property @property.Name</h3>
 
 <EditForm EditContext="@editContext" OnValidSubmit="HandleSubmit">
@@ -82,6 +85,7 @@
     private EditContext editContext;
     private bool isFormInvalid = true;
     private decimal estimatedPrice;
+    private NotificationComponent notificationComponent;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -110,6 +114,13 @@
             };
         property = await Http.GetFromJsonAsync<PropertyModel>($"api/properties/{PropertyId}", options);   
         availableDates = await Http.GetFromJsonAsync<List<DateTime>>($"api/properties/{PropertyId}/available-days");
+
+        if (availableDates.Count == 0)
+        {
+            notificationComponent.Warn("Sorry, but it looks like this property has no dates available. Try something else.");
+            return;
+        }
+
         createBookingModel.StartDate = availableDates.First();
         createBookingModel.EndDate = availableDates.Last();
         createBookingModel.PropertyID = property.ID;
@@ -120,7 +131,7 @@
     private void CalculateTotalPrice()
     {
         int days = (int)(createBookingModel.EndDate - createBookingModel.StartDate).TotalDays + 1;
-        estimatedPrice = property.PricePerHour * days;
+        estimatedPrice = property.PricePerNight * days;
     }
 
     private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
@@ -137,7 +148,7 @@
 
     private async Task HandleSubmit()
     {
-        var token = await TokenManager.GetAuthTokenAsync();
+        var token = await LocalStorageManager.GetAuthTokenAsync();
 
          if (token == null)
          {
