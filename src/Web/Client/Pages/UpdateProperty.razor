@@ -8,7 +8,7 @@
 @using System.Text.Json.Serialization;
 @using System.Text;
 @using Web.Shared.Dto;
-@inject TokenManager TokenManager
+@inject LocalStorageManager LocalStorageManager
 @inject NavigationManager NavigationManager
 @using Web.Shared.Dto.Property;
 @inject HttpClient Http
@@ -49,6 +49,7 @@
  }
 </style>
 
+<NotificationComponent @ref="notificationComponent" />
 
 <h3>Update Property</h3>
 
@@ -83,18 +84,18 @@
     </div>
 
     <div class="form-group">
-        <label for="contactPhone">Contact Phone:</label>
+        <label for="contactPhone">Contact phone:</label>
         <InputText id="contactPhone" @bind-Value="updatePropertyModel.ContactPhone" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label for="contactName">Contact Name:</label>
+        <label for="contactName">Contact name:</label>
         <InputText id="contactName" @bind-Value="updatePropertyModel.ContactName" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label for="pricePerHour">Price Per Hour:</label>
-        <InputNumber id="pricePerHour" @bind-Value="updatePropertyModel.PricePerHour" class="form-control" />
+        <label for="PricePerNight">Price per night:</label>
+        <InputNumber id="PricePerNight" @bind-Value="updatePropertyModel.PricePerNight" class="form-control" />
     </div>
 
 
@@ -110,12 +111,12 @@
     </div>
 
     <div class="form-group">
-        <label for="startDate">Start Date:</label>
+        <label for="startDate">Start date:</label>
         <InputDate id="startDate" @bind-Value="updatePropertyModel.StartDate" class="form-control" />
     </div>
 
     <div class="form-group">
-        <label for="endDate">EndDate:</label>
+        <label for="endDate">End date:</label>
         <InputDate id="endDate" @bind-Value="updatePropertyModel.EndDate" class="form-control" />
     </div>
 
@@ -124,7 +125,7 @@
         <InputCheckbox id="archived" @bind-Value="updatePropertyModel.IsArchived"  />
     </div>
 
-    <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Add Property</button>
+    <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Update the property</button>
 </EditForm>
 
 @code {
@@ -134,7 +135,8 @@
     private UpdatePropertyModel updatePropertyModel = new UpdatePropertyModel();
     private EditContext editContext;
     private bool isFormInvalid = true;
-   
+    private NotificationComponent notificationComponent;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {   
 
@@ -163,7 +165,7 @@
         updatePropertyModel.Location = property.Location;
         updatePropertyModel.ContactPhone = property.ContactPhone;
         updatePropertyModel.ContactName = property.ContactName;
-        updatePropertyModel.PricePerHour = property.PricePerHour;
+        updatePropertyModel.PricePerNight = property.PricePerNight;
         updatePropertyModel.ImageUrl = property.ImageUrl;
         updatePropertyModel.Capacity = property.Capacity;
         updatePropertyModel.StartDate = property.StartDate;
@@ -184,7 +186,7 @@
 
     private async Task HandleSubmit()
     {
-        var token = await TokenManager.GetAuthTokenAsync();
+        var token = await LocalStorageManager.GetAuthTokenAsync();
 
         if (token == null)
         {
@@ -209,6 +211,11 @@
             {
                 NavigationManager.NavigateTo("/rental", forceLoad: true);
                 return;                
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                notificationComponent.Warn("The same property has already been registered");
             }
 
         }

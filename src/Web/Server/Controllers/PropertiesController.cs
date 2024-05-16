@@ -29,7 +29,7 @@ namespace Web.Server.Controllers
         [Authorize]
         public ActionResult<IEnumerable<Property>> GetAllMyProperties()
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+           string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
          
             var properties = _propertyService.FindAllByUserId(userId);
             return Ok(properties);
@@ -95,6 +95,17 @@ namespace Web.Server.Controllers
                 return BadRequest("Invalid Guid format");
             }
 
+            var maybeSameProperty = _propertyService.FindAll(new FindAllPropertiesDto()
+            {
+                Name = dto.Name,
+                Location = dto.Location,
+            });
+
+            if (maybeSameProperty.Any())
+            {
+                return Conflict("The same property has already been registered");
+            }
+
             var property = _propertyService.Create((Guid)guid, dto);
 
             string url = Url.Action("GetProperty", new { id = property.ID });
@@ -113,7 +124,19 @@ namespace Web.Server.Controllers
             {
                 return BadRequest("Invalid Guid format");
             }
-          
+
+            var maybeSameProperty = _propertyService.FindAll(new FindAllPropertiesDto()
+            {
+                Name = dto.Name,
+                Location = dto.Location,
+            });
+
+            if (maybeSameProperty.Count > 1 || maybeSameProperty.Count == 1 && maybeSameProperty.First().ID.ToString() != id)
+            {
+                return Conflict("The same property has already been registered");
+            }
+
+
             try
             {
                 var updatedProperty = _propertyService.Update(userId, id, dto, isAdmin);

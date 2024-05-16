@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
-@inject TokenManager TokenManager
+@inject LocalStorageManager LocalStorageManager
 
 <style>
     .top-row {
@@ -45,7 +45,15 @@
                         <NavLink class="nav-link" href="bookings">
                             Bookings
                         </NavLink>
-                       <NavLink class="nav-link" href="" @onclick="Logout">Logout</NavLink>
+
+                        @if (isAdmin)
+                        {
+                            <NavLink class="nav-link" href="user-management">
+                                User management
+                            </NavLink>
+                        }
+
+                        <NavLink class="nav-link" href="javascript:void(0);" @onclick="Logout">Logout</NavLink>
                     }
                     else
                     {
@@ -63,10 +71,12 @@
 
 @code {
     private bool isLoggedIn = false;
+    private bool isAdmin = false;
 
     protected override async Task OnInitializedAsync()
     {
-        string token = await TokenManager.GetAuthTokenAsync();
+        string token = await LocalStorageManager.GetAuthTokenAsync();
+        isAdmin = await LocalStorageManager.GetIsAdmin();
         if (token != null)
         {
             isLoggedIn = true;
@@ -76,8 +86,7 @@
     private async Task Logout()
     {
         isLoggedIn = false;
-        await TokenManager.RemoveToken();
-        await TokenManager.RemoveUserId();
+        await LocalStorageManager.ClearAll();
         NavigationManager.NavigateTo("/", forceLoad: true);
     }
 }

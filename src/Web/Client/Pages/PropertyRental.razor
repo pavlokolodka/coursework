@@ -9,7 +9,7 @@
 @using Web.Shared;
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject TokenManager TokenManager
+@inject LocalStorageManager LocalStorageManager
 
 <style>
 .search-bar {
@@ -112,7 +112,7 @@
 
     <input type="number" @bind="minCapacity" placeholder="Min Capacity" class="search-input" />
     <input type="text" @bind="locationFilter" placeholder="Location" class="search-input"/>
-    <input type="number" @bind="minPricePerHour" placeholder="Min Price per Hour" class="search-input"/>
+    <input type="number" @bind="minPricePerNight" placeholder="Min Price per Hour" class="search-input"/>
    
     <button @onclick="ApplyFilters" class="search-button">Search</button>
 </div>
@@ -131,10 +131,10 @@
                     <p><strong>Type:</strong> @property.Type</p>
                     <p><strong>Location:</strong> @property.Location</p>
                     <p><strong>Contact:</strong> @property.ContactName (@property.ContactPhone)</p>
-                    <p><strong>Price Per Hour:</strong> $@property.PricePerHour</p>
+                    <p><strong>Price Per Hour:</strong> $@property.PricePerNight</p>
                     <p><strong>Capacity:</strong> @property.Capacity</p>
                     <p><strong>Available Dates:</strong> @property.StartDate.ToShortDateString() - @property.EndDate.ToShortDateString()</p>
-                
+                    <p><strong>Is archived:</strong> @property.IsArchived</p>
                 </div>
             </div>
     }
@@ -150,7 +150,7 @@
     private string typeFilter = "";
     private int? minCapacity;
     private string locationFilter = "";
-    private decimal? minPricePerHour;
+    private decimal? minPricePerNight;
     private List<PropertyModel> properties = new List<PropertyModel>();
     private List<PropertyModel> filteredProperties = new List<PropertyModel>();
     private List<string> validationErrors = new List<string>();
@@ -168,7 +168,7 @@
         try       
         {
 
-            string token = await TokenManager.GetAuthTokenAsync();
+            string token = await LocalStorageManager.GetAuthTokenAsync();
 
             if (string.IsNullOrEmpty(token))
             {
@@ -200,7 +200,7 @@
                 Type = isTypeValid ? typeEnum : null,
                 Capacity = minCapacity,
                 Location = locationFilter,
-                PricePerHour = minPricePerHour
+                PricePerNight = minPricePerNight
             };
         var errors = ModelValidator.ValidateModel(dto);
         if (errors.Count > 0)
@@ -221,8 +221,8 @@
             query.Add($"type={dto.Type.Value}");
         if (!string.IsNullOrEmpty(dto.Location))
             query.Add($"location={Uri.EscapeDataString(dto.Location)}");
-        if (dto.PricePerHour.HasValue)
-            query.Add($"pricePerHour={dto.PricePerHour.Value}");
+        if (dto.PricePerNight.HasValue)
+            query.Add($"PricePerNight={dto.PricePerNight.Value}");
         if (dto.Capacity.HasValue)
             query.Add($"capacity={dto.Capacity.Value}");
         if (dto.StartDate.HasValue)

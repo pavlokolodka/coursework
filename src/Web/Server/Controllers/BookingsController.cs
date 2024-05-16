@@ -83,6 +83,11 @@ namespace Web.Server.Controllers
                 return NotFound("Property not found");
             }
 
+            if (bookedProperty.UserID.ToString() == userId)
+            {
+                return NotFound("Cannot book own property");
+            }
+
             if (bookedProperty.IsArchived == true)
             {
                 return Conflict("Cannot book an archived property");
@@ -103,7 +108,7 @@ namespace Web.Server.Controllers
                 PropertyID = dto.PropertyID,
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
-                PricePerHour = bookedProperty.PricePerHour
+                PricePerNight = bookedProperty.PricePerNight
             };
 
             try
@@ -171,7 +176,7 @@ namespace Web.Server.Controllers
                 {
                     UserID = userId,
                     BookingID = id,
-                    PricePerHour = bookedProperty.PricePerHour,
+                    PricePerNight = bookedProperty.PricePerNight,
                     StartDate = dto.StartDate,
                     EndDate = dto.EndDate,
                     IsAdmin = isAdmin

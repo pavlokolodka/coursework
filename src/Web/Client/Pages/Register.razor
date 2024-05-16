@@ -6,7 +6,7 @@
 @using Web.Shared.Dto;
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject TokenManager TokenManager
+@inject LocalStorageManager LocalStorageManager
 
 
 <style>
@@ -122,8 +122,8 @@ button {
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResult>();
-                await TokenManager.SetToken(result.AccessToken);
-                NavigationManager.NavigateTo("/properties");
+                await LocalStorageManager.SetToken(result.AccessToken);
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
             {

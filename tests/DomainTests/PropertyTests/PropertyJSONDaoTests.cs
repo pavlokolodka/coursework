@@ -17,14 +17,14 @@ namespace DomainTests
             string location = faker.Address.FullAddress();
             string contactPhone = faker.Phone.PhoneNumber("+380#########");
             string contactName = faker.Name.FirstName();
-            decimal pricePerHour = faker.Finance.Amount(10, 1000);
+            decimal PricePerNight = faker.Finance.Amount(10, 1000);
             int capacity = faker.Random.Int(1, 20);
             DateTime startDate = DateTime.Now.AddSeconds(1);
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
             var dao = new PropertyJSONDao();
             string imageUrl = "https://domain/photo.jpeg";
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
+            Property property = new Property(name, description, type, location, contactPhone, contactName, PricePerNight, capacity, startDate, endDate, imageUrl, creatorID);
             var createdProperty = dao.Create(property);
 
             Assert.AreEqual(name, createdProperty.Name);
@@ -33,7 +33,7 @@ namespace DomainTests
             Assert.AreEqual(location, createdProperty.Location);
             Assert.AreEqual(contactPhone, createdProperty.ContactPhone);
             Assert.AreEqual(contactName, createdProperty.ContactName);
-            Assert.AreEqual(pricePerHour, createdProperty.PricePerHour);
+            Assert.AreEqual(PricePerNight, createdProperty.PricePerNight);
             Assert.AreEqual(capacity, createdProperty.Capacity);
             Assert.AreEqual(startDate, createdProperty.StartDate);
             Assert.AreEqual(endDate, createdProperty.EndDate);
@@ -53,14 +53,14 @@ namespace DomainTests
             string contactPhone = faker.Phone.PhoneNumber("+000#########");
             string contactName = faker.Name.FirstName();
             // invalid
-            decimal pricePerHour = faker.Finance.Amount(100000, 1000000);
+            decimal PricePerNight = faker.Finance.Amount(100000, 1000000);
             int capacity = faker.Random.Int(100, 200);
             DateTime startDate = faker.Date.Recent();
             DateTime endDate = startDate.AddDays(faker.Random.Int(1, 30));
             Guid creatorID = Guid.NewGuid();
             var dao = new PropertyJSONDao();
             string imageUrl = "https://domain/photo.jpeg";
-            Property property = new Property(name, description, type, location, contactPhone, contactName, pricePerHour, capacity, startDate, endDate, imageUrl, creatorID);
+            Property property = new Property(name, description, type, location, contactPhone, contactName, PricePerNight, capacity, startDate, endDate, imageUrl, creatorID);
 
             try
             {

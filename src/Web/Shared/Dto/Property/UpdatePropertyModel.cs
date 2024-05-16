@@ -23,8 +23,8 @@ namespace Web.Shared.Dto.Property
         public PropertyType? Type { get; set; } = null;
         public string? Location { get; set; } = null;
       
-        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-        public decimal? PricePerHour { get; set; } = null;
+        [Range(1, int.MaxValue, ErrorMessage = "PricePerNight must be greater than 0")]
+        public decimal? PricePerNight { get; set; } = null;
         
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
         public int? Capacity { get; set; } = null;

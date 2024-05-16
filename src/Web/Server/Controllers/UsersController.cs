@@ -11,9 +11,11 @@ namespace Web.Server.Controllers
     {
         private readonly UserService _userService;
         private readonly BookingService _bookingService;
-        public UsersController(UserService userService, BookingService bookingService) {
+        private readonly PropertyService _propertyService;
+        public UsersController(UserService userService, BookingService bookingService, PropertyService propertyService) {
             _userService = userService;
             _bookingService = bookingService;
+            _propertyService = propertyService;
         }
    
         [HttpGet]
@@ -27,7 +29,7 @@ namespace Web.Server.Controllers
                 return Forbid();
             }
 
-            var users = _userService.Find(user => true);
+            var users = _userService.Find(user => user.IsAdmin != true);
             return Ok(users);
         }
 
@@ -100,14 +102,15 @@ namespace Web.Server.Controllers
                 return Forbid();
             }
 
-            var userBookings = _bookingService.FindAllUserBookings(userId);
+            var userBookings = _bookingService.FindAllUserBookings(id);
 
             if (userBookings.Count > 0) {
                 return Conflict("Cannot delete user with active bookings");
             }
 
-            var updatedUser = _userService.Delete(id);
-                    
+            _userService.Delete(id);
+            _propertyService.ArchiveAllUserProperties(id);
+           
             return NoContent();
         }
     }    

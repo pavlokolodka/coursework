@@ -27,8 +27,8 @@ namespace Web.Shared.Dto
         [Required(ErrorMessage = "ContactName is required")]
         public string ContactName { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-        public decimal PricePerHour { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "PricePerNight must be greater than 0")]
+        public decimal PricePerNight { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
         public int Capacity { get; set; }

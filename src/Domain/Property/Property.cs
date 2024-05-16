@@ -30,8 +30,8 @@ namespace ReserveSpot.Domain
         [Required(ErrorMessage = "ContactName is required")]
         public string ContactName { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-        public decimal PricePerHour { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "PricePerNight must be greater than 0")]
+        public decimal PricePerNight { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
         public int Capacity { get; set; }
@@ -41,11 +41,7 @@ namespace ReserveSpot.Domain
 
         [EndDateGreaterThanStartDate(ErrorMessage = "EndDate must be greater than or equal to StartDate")]
         public DateTime EndDate { get; set; }
-
-      /*  public DateTime BookedStartDate { get; set; }
-
-        public DateTime BookedEndDate { get; set; }*/
-                
+        
         public bool IsArchived { get; set; } = false;
 
         [Required(ErrorMessage = "UserID is required")]
@@ -53,7 +49,7 @@ namespace ReserveSpot.Domain
                
         public static int PropetryCount;     
 
-        public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerHour, int capacity, DateTime startDate, DateTime endDate, string imageUrl, Guid creatorID)
+        public Property(string name, string description, PropertyType type, string location, string contactPhone, string contactName, decimal pricePerNight, int capacity, DateTime startDate, DateTime endDate, string imageUrl, Guid creatorID)
         {
             Name = name;
             Description = description;
@@ -61,7 +57,7 @@ namespace ReserveSpot.Domain
             Location = location;
             ContactPhone = contactPhone;
             ContactName = contactName;
-            PricePerHour = pricePerHour;
+            PricePerNight = pricePerNight;
             Capacity = capacity;
             StartDate = startDate;
             EndDate = endDate;
@@ -77,7 +73,7 @@ namespace ReserveSpot.Domain
             Location = updateDetail.Location ?? Location;
             ContactPhone = updateDetail.ContactPhone ?? ContactPhone;
             ContactName = updateDetail.ContactName ?? ContactName;
-            PricePerHour = updateDetail.PricePerHour ?? PricePerHour;
+            PricePerNight = updateDetail.PricePerNight ?? PricePerNight;
             Capacity = updateDetail.Capacity ?? Capacity;
             ImageUrl = updateDetail.ImageUrl ?? ImageUrl;
             IsArchived = updateDetail.IsArchived ?? IsArchived;
@@ -134,7 +130,7 @@ namespace ReserveSpot.Domain
         public string? Description { get; set; }
         public PropertyType? Type { get; set; }
         public string? Location { get; set; }
-        public decimal? PricePerHour { get; set; }
+        public decimal? PricePerNight { get; set; }
         public int? Capacity { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

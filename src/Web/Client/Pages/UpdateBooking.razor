@@ -9,7 +9,7 @@
 @using System.Text.Json.Serialization;
 @using System.Text;
 @using Web.Shared.Dto;
-@inject TokenManager TokenManager
+@inject LocalStorageManager LocalStorageManager
 @inject NavigationManager NavigationManager
 @using Web.Shared.Dto.Property;
 @inject HttpClient Http
@@ -72,7 +72,7 @@
         <InputDate id="endDate" @bind-Value="updateBookingModel.EndDate" class="form-control" />
     </div>    
 
-    <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Book now</button>
+    <button type="submit" class="btn btn-primary" disabled="@isFormInvalid">Confirm</button>
 </EditForm>
 
 @code {
@@ -89,7 +89,7 @@
     {
         if (firstRender)
         {
-            var token = await TokenManager.GetAuthTokenAsync();
+            var token = await LocalStorageManager.GetAuthTokenAsync();
 
             if (token == null)
             {
@@ -146,7 +146,7 @@
         editContext = new EditContext(updateBookingModel);
         editContext.OnFieldChanged += HandleFieldChanged;
 
-        var token = await TokenManager.GetAuthTokenAsync();
+        var token = await LocalStorageManager.GetAuthTokenAsync();
 
         if (token == null)
         {
@@ -169,7 +169,7 @@
         DateTime EndDate = updateBookingModel.EndDate;
         DateTime StartDate = updateBookingModel.StartDate;
         int days = (int)(EndDate - StartDate).TotalDays + 1;
-        estimatedPrice = property.PricePerHour * days;
+        estimatedPrice = property.PricePerNight * days;
     }
 
     private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
@@ -186,7 +186,7 @@
 
     private async Task HandleSubmit()
     {
-        var token = await TokenManager.GetAuthTokenAsync();
+        var token = await LocalStorageManager.GetAuthTokenAsync();
 
          if (token == null)
          {

@@ -13,7 +13,7 @@ namespace ReserveSpot.Domain
 
         public Booking Create(CreateBookingDto payload)
         {
-            Booking newBooking = new(payload.Name, payload.PricePerHour, payload.StartDate, payload.EndDate, payload.UserID, payload.PropertyID);
+            Booking newBooking = new(payload.Name, payload.PricePerNight, payload.StartDate, payload.EndDate, payload.UserID, payload.PropertyID);
 
             return bookingDao.Create(newBooking);
         }
@@ -63,6 +63,11 @@ namespace ReserveSpot.Domain
             return bookingDao.FindMany(booking => booking.PropertyID.ToString() == propertyId);
         }
 
+        public bool DeleteAllByUserId(string userId)
+        {
+            bookingDao.Delete(booking => booking.UserID.ToString() == userId);
+            return true;
+        }
         public bool Delete(DeleteBookingDto payload)
         {
             var booking = bookingDao.FindOne(booking => booking.ID.ToString() == payload.BookingID);

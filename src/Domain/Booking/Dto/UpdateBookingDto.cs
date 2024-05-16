@@ -20,6 +20,6 @@ namespace ReserveSpot.Domain
         public DateTime? EndDate { get; set; }
 
         [Range(1, double.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
-        public decimal PricePerHour { get; set; }
+        public decimal PricePerNight { get; set; }
     }
 }

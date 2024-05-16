@@ -30,8 +30,8 @@ namespace Web.Shared.Dto
         [Range(1, double.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
         public decimal TotalPrice { get; set; }
 
-        [Range(1, double.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-        public decimal PricePerHour { get; set; }
+        [Range(1, double.MaxValue, ErrorMessage = "PricePerNight must be greater than 0")]
+        public decimal PricePerNight { get; set; }
     }
 
     public enum BookingStatus

@@ -32,8 +32,8 @@ namespace Web.Shared.Dto
 
         public bool IsArchived { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-		public decimal PricePerHour { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "PricePerNight must be greater than 0")]
+		public decimal PricePerNight { get; set; }
 
 		[Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
 		public int Capacity { get; set; }
@@ -50,9 +50,9 @@ namespace Web.Shared.Dto
 		public Guid ID { get; set; }	
 
 		public static int PropetryCount;
-		public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
+		public static decimal CountTotalPrice(decimal PricePerNight, int numberOfDays)
 		{
-			return pricePerHour * 24 * numberOfDays;
+			return PricePerNight * 24 * numberOfDays;
 		}
 	}
     public enum PropertyType
