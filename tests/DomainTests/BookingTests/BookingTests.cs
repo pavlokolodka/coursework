@@ -16,14 +16,14 @@ namespace DomainTests
             Guid userId = Guid.NewGuid();
             Guid propertyId = Guid.NewGuid();
             decimal price = 150.40M;
-            decimal expectedTotalPrice = price * 8 * 24;
+            decimal expectedTotalPrice = price * 8;
             string name = "Test booking";
             Booking booking = new Booking(name, price, startDate, endDate, userId, propertyId);
 
             Assert.AreEqual(name, booking.Name);
             Assert.AreEqual(startDate, booking.StartDate);
             Assert.AreEqual(endDate, booking.EndDate);
-            Assert.AreEqual(price, booking.PricePerHour);
+            Assert.AreEqual(price, booking.PricePerNight);
             Assert.AreEqual(expectedTotalPrice, booking.TotalPrice);
             Assert.AreEqual(userId, booking.UserID);
             Assert.AreEqual(propertyId, booking.PropertyID);
@@ -49,11 +49,11 @@ namespace DomainTests
         [TestMethod]
         public void CountTotalPrice_ValidInput()
         {
-            decimal pricePerHour = 50.00m;
+            decimal pricePerNight = 50.00m;
             int numberOfDays = 7;
-            decimal expectedTotalPrice = 50.00m * 24 * 7;
+            decimal expectedTotalPrice = 50.00m * numberOfDays;
 
-            decimal totalPrice = Booking.CountTotalPrice(pricePerHour, numberOfDays);
+            decimal totalPrice = Booking.CountTotalPrice(pricePerNight, numberOfDays);
 
             Assert.AreEqual(expectedTotalPrice, totalPrice);
         }
@@ -99,7 +99,7 @@ namespace DomainTests
                 { nameof(Booking.StartDate), "StartDate must be less than or equal to EndDate" },
                 { nameof(Booking.EndDate), "EndDate must be greater than or equal to StartDate" },
                 { nameof(Booking.TotalPrice), "TotalPrice must be greater than 0" },
-                { nameof(Booking.PricePerHour), "PricePerHour must be greater than 0" }
+                { nameof(Booking.PricePerNight), "PricePerNight must be greater than 0" }
             };
 
             foreach (var result in results)

@@ -18,8 +18,8 @@ namespace ReserveSpot.Domain
         public PropertyType? Type { get; set; }
         public string? Location { get; set; }
         
-        [Range(1, int.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-        public decimal? PricePerHour { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "PricePerNight must be greater than 0")]
+        public decimal? PricePerNight { get; set; }
       
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
         public int? Capacity { get; set; }

@@ -13,7 +13,7 @@ namespace ReserveSpot.Domain
 
         public Property Create(Guid userId, CreatePropertyDto payload)
         {
-            Property newProperty = new Property(payload.Name, payload.Description, (PropertyType)payload.Type, payload.Location, payload.ContactPhone, payload.ContactName, payload.PricePerHour, payload.Capacity, (DateTime)payload.StartDate, (DateTime)payload.EndDate, payload.ImageUrl, userId); ;
+            Property newProperty = new Property(payload.Name, payload.Description, (PropertyType)payload.Type, payload.Location, payload.ContactPhone, payload.ContactName, payload.PricePerNight, payload.Capacity, (DateTime)payload.StartDate, (DateTime)payload.EndDate, payload.ImageUrl, userId); ;
             return propertyDao.Create(newProperty);
         }
 
@@ -51,7 +51,7 @@ namespace ReserveSpot.Domain
             (payload.Name == null || property.Name.Contains(payload.Name, StringComparison.OrdinalIgnoreCase)) &&  
             (payload.Type == null || property.Type == payload.Type) &&          
             (payload.Location == null || property.Location.Contains(payload.Location)) &&  
-            (payload.PricePerHour == null || property.PricePerHour <= payload.PricePerHour) && 
+            (payload.PricePerNight == null || property.PricePerNight <= payload.PricePerNight) && 
             (payload.Capacity == null || property.Capacity >= payload.Capacity) &&  
             (payload.StartDate == null || property.StartDate >= payload.StartDate) &&  
             (payload.EndDate == null || property.EndDate <= payload.EndDate) &&
@@ -77,6 +77,18 @@ namespace ReserveSpot.Domain
 
             propertyDao.Delete(property => property.ID.ToString() == id);
             return true;
+        }
+
+        public void ArchiveAllUserProperties(string userId)
+        {
+            List<Property> properties = propertyDao.FindMany(property => property.UserID.ToString() == userId);
+
+            if (properties.Count == 0) return;
+
+            properties.ForEach(property => {
+                property.IsArchived = true;
+                propertyDao.Update(p => p.ID.ToString() == property.ID.ToString(), property);
+            });
         }
     }
 }

@@ -28,23 +28,23 @@ namespace ReserveSpot.Domain
         [Range(1, double.MaxValue, ErrorMessage = "TotalPrice must be greater than 0")]
         public decimal TotalPrice { get; set; }
 
-        [Range(1, double.MaxValue, ErrorMessage = "PricePerHour must be greater than 0")]
-        public decimal PricePerHour { get; set; }
+        [Range(1, double.MaxValue, ErrorMessage = "PricePerNight must be greater than 0")]
+        public decimal PricePerNight { get; set; }
 
-        public Booking(string name, decimal pricePerHour, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
+        public Booking(string name, decimal pricePerNight, DateTime startDate, DateTime endDate, Guid userId, Guid propertyId) {
             Name = name;
-            PricePerHour = pricePerHour;
+            PricePerNight = pricePerNight;
             StartDate = startDate;
             EndDate = endDate;
             UserID = userId;
             PropertyID = propertyId;
             Status = BookingStatus.Registered;
             int totalDays = CountTotalDays();
-            TotalPrice = CountTotalPrice(pricePerHour, totalDays);
+            TotalPrice = CountTotalPrice(PricePerNight, totalDays);
         }
-        public static decimal CountTotalPrice(decimal pricePerHour, int numberOfDays)
+        public static decimal CountTotalPrice(decimal pricePerNight, int numberOfDays)
         {
-            return pricePerHour * 24 * numberOfDays;
+            return pricePerNight * numberOfDays;
         }
         public void CheckBookingStatus()
         {
@@ -72,7 +72,7 @@ namespace ReserveSpot.Domain
             EndDate = endDate ?? EndDate; 
 
             int totalDays = CountTotalDays();
-            TotalPrice = CountTotalPrice(PricePerHour, totalDays);
+            TotalPrice = CountTotalPrice(PricePerNight, totalDays);
         }        
     }
 }
