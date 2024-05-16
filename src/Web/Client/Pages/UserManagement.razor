@@ -1,0 +1,114 @@
+﻿@page "/user-management"
+
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using Web.Shared.Dto;
+@inject LocalStorageManager LocalStorageManager
+@inject HttpClient Http
+
+<h3>Admin Page</h3>
+
+<NotificationComponent @ref="notificationComponent" />
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteUser(user.ID.ToString())">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<UserModel> users;
+    private NotificationComponent notificationComponent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+
+        try
+        {
+            string token = await LocalStorageManager.GetAuthTokenAsync();
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/users/");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                users = JsonSerializer.Deserialize<List<UserModel>>(json, options);               
+            }
+
+        }
+        catch (Exception ex)
+        {
+            notificationComponent.Warn("Something went wrong. Try again.");
+        }
+
+    }
+
+    private async Task DeleteUser(string id)
+    {
+        var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter() }
+            };
+
+        try
+        {
+            string token = await LocalStorageManager.GetAuthTokenAsync();
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/users/{id}");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Trim('"'));
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                users.RemoveAll(user => user.ID.ToString() == id);
+
+                notificationComponent.Inform("The user has been successfully deleted");
+            }
+            else
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+                {
+                    notificationComponent.Warn("Cannot delete selected user: the user has pending bookings");
+
+                }
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            notificationComponent.Warn("Something went wrong. Try again.");
+        }
+    }
+}
